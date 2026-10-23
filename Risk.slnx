@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Risk.Api/Risk.Api.csproj" />
+  <Project Path="Risk.Tests/Risk.Tests.csproj" />
+</Solution>
