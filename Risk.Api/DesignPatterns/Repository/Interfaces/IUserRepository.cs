@@ -1,6 +1,6 @@
 using Risk.Api.Models;
 
-namespace Risk.Api.DesignPatterns.Repository;
+namespace Risk.Api.DesignPatterns.Repository.Interfaces;
 
 public interface IUserRepository
 {

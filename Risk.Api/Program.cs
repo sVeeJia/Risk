@@ -1,6 +1,10 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Risk.Api.DesignPatterns;
+using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.DesignPatterns.Repository;
+using Risk.Api.Services;
+using Risk.Api.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,7 @@ builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnection));
 
 // Add UserRepository as a singleton service
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 var app = builder.Build();
 

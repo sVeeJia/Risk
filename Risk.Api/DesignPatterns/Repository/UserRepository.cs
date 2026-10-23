@@ -1,5 +1,6 @@
 using MongoDB.Driver;
 using Risk.Api.Models;
+using Risk.Api.DesignPatterns.Repository.Interfaces;
 
 namespace Risk.Api.DesignPatterns.Repository;
 
