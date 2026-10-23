@@ -4,6 +4,7 @@ using Risk.Api.Dtos.Requests;
 using Risk.Api.Dtos.Responses;
 using Risk.Api.Models;
 using Risk.Api.Services.Interfaces;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Risk.Api.Controllers;
 
@@ -24,6 +25,7 @@ public sealed class AuthController : ControllerBase
         _env = env;
     }
 
+    [EnableRateLimiting("auth")]
     [HttpPost("register")]
     public async Task<ActionResult<UserResponse>> RegisterAsync([FromBody] Register request)
     {
@@ -38,6 +40,7 @@ public sealed class AuthController : ControllerBase
         return StatusCode(StatusCodes.Status201Created, ToResponse(result.User!));
     }
 
+    [EnableRateLimiting("auth")]
     [HttpPost("login")]
     public async Task<ActionResult<UserResponse>> LoginAsync([FromBody] Login request)
     {

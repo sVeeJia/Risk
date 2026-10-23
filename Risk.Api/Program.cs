@@ -8,6 +8,8 @@ using Risk.Api.Services.Interfaces;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +75,23 @@ builder.Services.AddCors(options =>
         .AllowCredentials());
 });
 
+// Configure rate limiting for authentication endpoints
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // Max 10 login/register attempts per minute for each IP address.
+    options.AddPolicy("auth", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -86,6 +105,8 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 app.UseCors("web");
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
