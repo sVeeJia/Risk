@@ -5,6 +5,9 @@ using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.DesignPatterns.Repository;
 using Risk.Api.Services;
 using Risk.Api.Services.Interfaces;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +26,53 @@ builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
 
+// Configure JWT authentication
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false; // keep "sub", "name", "email" exactly as written in the token
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 },
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30),
+            NameClaimType = "name"
+        };
+
+        // The token travels in the HttpOnly cookie, not in an Authorization header.
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies["risk_auth"];
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? new[] { "http://localhost:5173" };
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("web", policy => policy
+        .WithOrigins(allowedOrigins)
+        .WithMethods("GET", "POST", "PUT", "DELETE")
+        .WithHeaders("Content-Type")
+        .AllowCredentials());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,6 +85,9 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.UseCors("web");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
