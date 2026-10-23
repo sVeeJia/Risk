@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Risk.Api.DesignPatterns.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,8 @@ builder.Services.AddOpenApi();
 var mongoConnection = builder.Configuration["Mongo:ConnectionString"]?? throw new InvalidOperationException("Mongo:ConnectionString is not set.");
 builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnection));
 
+// Add UserRepository as a singleton service
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
