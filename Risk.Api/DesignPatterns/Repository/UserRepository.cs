@@ -23,5 +23,16 @@ public sealed class UserRepository : IUserRepository
 
     public async Task<User?> GetByIdAsync(string id) => await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
 
-    public Task CreateAsync(User user) => _users.InsertOneAsync(user);
+    public async Task<bool> CreateAsync(User user)
+    {
+        try
+        {
+            await _users.InsertOneAsync(user);
+            return true;
+        }
+        catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+        {
+            return false; // the unique email index rejected it
+        }
+    }
 }

@@ -18,9 +18,10 @@ builder.Services.AddOpenApi();
 var mongoConnection = builder.Configuration["Mongo:ConnectionString"]?? throw new InvalidOperationException("Mongo:ConnectionString is not set.");
 builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnection));
 
-// Add UserRepository as a singleton service
+// Added services
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddSingleton<IAuthService, AuthService>();
 
 var app = builder.Build();
 
