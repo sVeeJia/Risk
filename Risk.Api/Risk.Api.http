@@ -1,6 +1,67 @@
 @Risk.Api_HostAddress = http://localhost:5270
 
-GET {{Risk.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Check the Mongo connection
+GET {{Risk.Api_HostAddress}}/health/db
 
-###
+### Register
+POST {{Risk.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "tester1@example.com",
+  "password": "Test1234567!",
+  "displayName": "Tester One"
+}
+
+### Register again with different casing (expect 409)
+POST {{Risk.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "TESTER1@example.com",
+  "password": "Test1234567!",
+  "displayName": "Duplicate"
+}
+
+### Register with bad input (expect 400)
+POST {{Risk.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "short",
+  "displayName": "X"
+}
+
+### Login (expect 200)
+POST {{Risk.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "tester1@example.com",
+  "password": "Test1234567!"
+}
+
+### Login with wrong password (expect 401)
+POST {{Risk.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "tester1@example.com",
+  "password": "WrongPassword123"
+}
+
+### Login with unknown email (expect the same 401)
+POST {{Risk.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "nobody@example.com",
+  "password": "Test1234567!"
+}
+
+### Who am I (expect 200 after login, 401 after logout)
+GET {{Risk.Api_HostAddress}}/api/auth/me
+
+### Logout
+POST {{Risk.Api_HostAddress}}/api/auth/logout
