@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
+using Risk.Api.Data;
+using Risk.Api.Data.Import;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,9 @@ builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnection));
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
+builder.Services.AddSingleton<ICountrySource>(_ => new ExcelCountrySource(Path.Combine(AppContext.BaseDirectory, "Data", "SeedData", "CountriesPopulationForRisk.xlsx")));
+builder.Services.AddSingleton<ICountryRepository, CountryRepository>();
+builder.Services.AddSingleton<CountrySeeder>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");
@@ -119,5 +124,7 @@ app.MapGet("/health/db", async (IMongoClient client) =>
     await client.GetDatabase("admin").RunCommandAsync<BsonDocument>(new BsonDocument("ping", 1));
     return Results.Ok("Mongo connected");
 });
+
+await app.Services.GetRequiredService<CountrySeeder>().SeedAsync();
 
 app.Run();
