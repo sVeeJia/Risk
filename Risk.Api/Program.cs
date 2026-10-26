@@ -29,9 +29,6 @@ builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnection));
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
-builder.Services.AddSingleton<ICountrySource>(_ => new ExcelCountrySource(Path.Combine(AppContext.BaseDirectory, "Data", "SeedData", "CountriesPopulationForRisk.xlsx")));
-builder.Services.AddSingleton<ICountryRepository, CountryRepository>();
-builder.Services.AddSingleton<CountrySeeder>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");
