@@ -1,0 +1,8 @@
+.auth-scene { min-height: 100svh; display: flex; justify-content: center; align-items: center; padding: 40px 20px; position: relative; isolation: isolate; overflow: hidden; background: #10191c; }
+.auth-map { position: absolute; inset: 0; padding: clamp(12px, 3vmin, 40px); opacity: .16; z-index: -1; pointer-events: none; }
+.auth-map .world-map { width: 100%; height: 100%; overflow: hidden; }
+.auth-panel { border: 1px solid #7b775044; background: #172325f5; padding: 32px; box-shadow: 0 20px 80px #0005; }
+.auth-scene input { border-radius: 2px; background: #101b1e; border-color: #435450; }
+.auth-scene input:focus { border-color: #c7a565; --tw-ring-color: #c7a56530; }
+.auth-scene a.text-emerald-400 { color: #d6b775; }
+@media (max-width: 760px) { .auth-panel { padding: 25px; } }

@@ -1,0 +1,45 @@
+﻿/* The native dialog is the scrolling overlay; its grid paints a content-sized card. */
+.briefing:has(.game-setup) { position: fixed; inset: 0; width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 24px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; background: transparent; border: 0; box-shadow: none; scrollbar-gutter: stable; overflow-anchor: none; isolation: isolate; }
+.briefing[open]:has(.game-setup) { display: grid; grid-template-columns: minmax(0, 1120px); grid-template-rows: max-content max-content max-content; align-content: start; justify-content: center; }
+.briefing:has(.game-setup)::before { content: ''; grid-column: 1; grid-row: 1 / 4; height: auto; align-self: stretch; background: #1b292b; border: 1px solid #8a7957; box-shadow: 0 30px 100px #0009; pointer-events: none; z-index: 0; }
+.briefing:has(.game-setup) > .close-briefing { position: absolute; top: 44px; right: max(46px, calc((100% - 1120px) / 2 + 22px)); z-index: 2; }
+.briefing:has(.game-setup) > .eyebrow { position: relative; grid-column: 1; grid-row: 1; margin: 0; padding: 24px 28px 0; z-index: 1; }
+.briefing:has(.game-setup) h2 { position: relative; grid-column: 1; grid-row: 2; margin: 0; padding: 6px 28px 12px; z-index: 1; }
+.briefing .game-setup { position: relative; grid-column: 1; grid-row: 3; display: flex; flex-direction: column; height: auto; max-height: none; min-height: 0; padding: 0 28px 24px; overflow: visible; z-index: 1; }
+.game-setup > p { margin: 0 0 12px; max-width: 1000px; }
+.setup-workspace { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); grid-template-rows: max-content max-content; align-items: stretch; column-gap: 18px; row-gap: 16px; flex: none; }
+.setup-picker-column { display: contents; }
+.setup-picker-column > .country-picker { grid-column: 1; grid-row: 1; height: auto; max-height: none; overflow: visible; }
+.setup-actions { grid-column: 1 / -1; grid-row: 2; padding-top: 0; }
+.setup-actions .setup-draw { margin: 0; }
+.setup-error-slot { height: auto; margin: 4px 0 0; overflow: visible; }
+.setup-board-column { grid-column: 2; grid-row: 1; height: auto; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: visible; padding: 18px; border: 1px solid #52645b; background: #101b1e55; }
+.setup-board-column > .eyebrow { margin: 0 0 12px; }
+.setup-board-column > .world-map { flex-shrink: 0; max-height: 32svh; }
+.setup-assignment-results { flex: 0 0 auto; min-height: auto; overflow: visible; }
+.setup-assignment-results > p { margin: 0 0 12px; }
+.setup-board-column > small { flex-shrink: 0; font-size: 10px; margin-top: auto; padding-top: 16px; }
+.setup-board-column .assigned-countries { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; list-style: none; padding: 0; margin: 0; }
+.region-description { color: #9aaca1; font-size: 12px; }
+.setup-draw { padding: 12px 18px; margin: 4px 0 12px; }
+.assigned-countries li { display: flex; align-items: center; gap: 8px; min-width: 0; height: 28px; margin: 0; font-size: 13px; line-height: 20px; }
+.assignment-color { height: 10px; width: 10px; flex: 0 0 10px; border: 1px solid #ffffff44; }
+.assignment-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.assignment-soldiers { display: inline-flex; align-items: center; justify-content: flex-end; flex: 0 0 auto; gap: 5px; min-width: 28px; color: #d1bb86; font-size: 12px; font-variant-numeric: tabular-nums; }
+@media (max-width: 1000px) {
+  .setup-workspace { grid-template-columns: 1fr; grid-template-rows: max-content max-content max-content; }
+  .setup-board-column { grid-column: 1; grid-row: 2; }
+  .setup-actions { grid-row: 3; }
+  .briefing:has(.game-setup) > .eyebrow { padding: 20px 20px 0; }
+  .briefing:has(.game-setup) h2 { padding-right: 20px; padding-left: 20px; }
+  .briefing .game-setup { padding: 0 20px 24px; }
+}
+@media (max-width: 500px) {
+  .briefing:has(.game-setup) { padding-right: 8px; padding-left: 8px; }
+  .briefing:has(.game-setup) > .close-briefing { right: 20px; }
+  .briefing:has(.game-setup) > .eyebrow { padding: 18px 12px 0; }
+  .briefing:has(.game-setup) h2 { padding-right: 12px; padding-left: 12px; }
+  .briefing .game-setup { padding: 0 12px 24px; }
+  .setup-workspace { column-gap: 16px; }
+  .setup-board-column { padding: 12px; }
+}

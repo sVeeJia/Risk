@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./base.css";
+@import "./components/alert.css";
+@import "./components/auth-layout.css";
+@import "./components/button.css";
+@import "./components/field.css";
+@import "./components/splash.css";
+@import "./features/country-picker.css";
+@import "./features/world-map.css";
+@import "./features/game-menu.css";
+@import "./features/game-setup.css";
+@import "./pages/landing.css";
+@import "./pages/lobby.css";
+@import "./pages/login.css";
+@import "./pages/register.css";
