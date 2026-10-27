@@ -3,6 +3,8 @@ using MongoDB.Driver;
 using Risk.Api.DesignPatterns;
 using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.DesignPatterns.Repository;
+using Risk.Api.DesignPatterns.Factory.Interfaces;
+using Risk.Api.DesignPatterns.Factory;
 using Risk.Api.Services;
 using Risk.Api.Services.Interfaces;
 using System.Text;
@@ -12,6 +14,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using Risk.Api.Data;
 using Risk.Api.Data.Import;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +37,8 @@ builder.Services.AddSingleton<ICountryRepository, CountryRepository>();
 builder.Services.AddSingleton<CountrySeeder>();
 builder.Services.AddSingleton<ICountryService, CountryService>();
 builder.Services.AddSingleton<IGameRepository, GameRepository>();
+builder.Services.AddSingleton<IGameFactory, GameFactory>();
+builder.Services.AddSingleton<IGameService, GameService>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");

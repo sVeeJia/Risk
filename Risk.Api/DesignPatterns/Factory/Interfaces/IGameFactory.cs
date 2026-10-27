@@ -8,7 +8,7 @@ public interface IGameFactory
         string ownerUserId,
         string ownerDisplayName,
         string chosenCountryId,
-        IReadOnlyList<Country> pool,
+        IReadOnlyList<Country> playableCountries,
         long seed,
         DateTime nowUtc
     );
