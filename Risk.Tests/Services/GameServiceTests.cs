@@ -114,4 +114,50 @@ public class GameServiceTests
 
         Assert.Equal(new[] { "new", "old" }, list.Select(g => g.Id));
     }
+
+    [Fact]
+    public async Task StartGame_ReplacesTheUsersUnplayedGame()
+    {
+        var (service, games) = Create();
+
+        await service.StartGameAsync("user-1", "Victor", "C07");
+        var second = await service.StartGameAsync("user-1", "Victor", "C08");
+
+        var remaining = Assert.Single(games.Items);
+        Assert.Equal(second.Game!.Id, remaining.Id);
+    }
+
+    [Fact]
+    public async Task StartGame_KeepsGamesThatHaveBeenPlayed()
+    {
+        var (service, games) = Create();
+        await service.StartGameAsync("user-1", "Victor", "C07");
+        games.Items[0].Version = 3; // an action has been saved
+
+        await service.StartGameAsync("user-1", "Victor", "C08");
+
+        Assert.Equal(2, games.Items.Count);
+    }
+
+    [Fact]
+    public async Task StartGame_DoesNotTouchOtherUsersGames()
+    {
+        var (service, games) = Create();
+        games.Items.Add(new Game { Id = "other", OwnerUserId = "user-2", Version = 0 });
+
+        await service.StartGameAsync("user-1", "Victor", "C07");
+
+        Assert.Contains(games.Items, g => g.Id == "other");
+    }
+
+    [Fact]
+    public async Task StartGame_InvalidCountry_DoesNotDeleteAnything()
+    {
+        var (service, games) = Create();
+        await service.StartGameAsync("user-1", "Victor", "C07");
+
+        await service.StartGameAsync("user-1", "Victor", "ZZ");
+
+        Assert.Single(games.Items);
+    }
 }
