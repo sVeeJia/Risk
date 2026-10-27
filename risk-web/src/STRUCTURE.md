@@ -37,6 +37,7 @@ src/
   pages/
     Landing.jsx
     Lobby.jsx
+    Game.jsx
     Login.jsx
     Register.jsx
   css/
@@ -59,6 +60,7 @@ src/
       lobby.css
       login.css
       register.css
+      game.css
 ```
 
 - `main.jsx` initializes React, routing, authentication, and the sole stylesheet import; `App.jsx` defines routes.

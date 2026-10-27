@@ -1,5 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react'
 import { Swords } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { getAllCountries } from '../../api/countries.js'
 import { startGame } from '../../api/games.js'
 import { toAssignments } from './boardAssignments.js'
@@ -8,8 +9,10 @@ import CountryPicker from '../countries/CountryPicker.jsx'
 import WorldMap from '../map/WorldMap.jsx'
 
 export default function GameSetup() {
+  const navigate = useNavigate()
   const [country, setCountry] = useState(null)
   const [assignments, setAssignments] = useState(null)
+  const [gameId, setGameId] = useState(null)
   const [preparing, setPreparing] = useState(false)
   const [error, setError] = useState('')
   const request = useRef(null)
@@ -24,6 +27,7 @@ export default function GameSetup() {
     setPreparing(false)
     setCountry(selected)
     setAssignments(null)
+    setGameId(null)
     setError('')
   }
 
@@ -33,6 +37,7 @@ export default function GameSetup() {
     request.current?.abort()
     request.current = controller
     setPreparing(true)
+    setGameId(null)
     setError('')
     try {
       // The server creates and saves the game and draws the nine other countries.
@@ -40,7 +45,12 @@ export default function GameSetup() {
         startGame(country.id, { signal: controller.signal }),
         getAllCountries({ signal: controller.signal }),
       ])
-      if (request.current === controller && !controller.signal.aborted) setAssignments(toAssignments(game, countries, worldRegions))
+      if (request.current === controller && !controller.signal.aborted) {
+        const nextAssignments = toAssignments(game, countries, worldRegions)
+        if (!game.id) throw new Error('The server did not return a saved game ID.')
+        setAssignments(nextAssignments)
+        setGameId(game.id)
+      }
     } catch (err) {
       if (request.current === controller && !controller.signal.aborted) {
         setError(err.status === 401 ? 'Your session has expired. Sign in again to start a game.' : err.message || 'Could not start a game. Please try again.')
@@ -60,6 +70,7 @@ export default function GameSetup() {
       <div className="setup-picker-column">
         <CountryPicker selected={country} onSelect={selectCountry} disabled={preparing} />
         <div className="setup-actions"><button type="button" className="game-button game-button-primary setup-draw" disabled={!country || preparing} onClick={prepareBoard}>{preparing ? 'Preparing your board...' : assignments ? 'Draw nine other countries again' : 'Prepare the 10-territory board'}</button>
+          {gameId && <button type="button" className="game-button game-button-primary setup-start" disabled={preparing} onClick={() => navigate(`/play/${encodeURIComponent(gameId)}`)}>Start game</button>}
           <p className="country-error setup-error-slot" role="alert">{error}</p>
         </div>
       </div>

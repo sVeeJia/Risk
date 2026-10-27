@@ -21,13 +21,15 @@ test('startGame posts only the starting country as JSON with the auth cookie and
 
 test('getGame and listGames use the expected authenticated GET endpoints', async t => {
   const paths = []
+  const controller = new AbortController()
   t.mock.method(globalThis, 'fetch', async (path, options) => {
     paths.push(path)
     assert.equal(options.method, 'GET')
     assert.equal(options.credentials, 'same-origin')
+    if (path !== '/api/games') assert.equal(options.signal, controller.signal)
     return Response.json(path === '/api/games' ? [game] : game)
   })
-  assert.deepEqual(await getGame('game-1'), game)
+  assert.deepEqual(await getGame('game-1', { signal: controller.signal }), game)
   assert.deepEqual(await listGames(), [game])
   assert.deepEqual(paths, ['/api/games/game-1', '/api/games'])
 })
