@@ -8,11 +8,13 @@ public class GameFactoryTests
 {
     private static readonly DateTime Now = new(2026, 10, 27, 12, 0, 0, DateTimeKind.Utc);
 
-    private static List<Country> PlayableCountries() => Enumerable.Range(1, 42)
-        .Select(i => new Country { Id = $"C{i:00}", Name = $"Country {i}", Population = i * 5_000_000L, Rank = i })
-        .ToList();
+    private static List<Country> PlayableCountries() =>
+        Enumerable.Range(1, 42)
+            .Select(i => new Country { Id = $"C{i:00}", Name = $"Country {i}", Population = i * 5_000_000L, Rank = i })
+            .ToList();
 
-    private static Game Create(long seed = 1, string chosen = "C07") => new GameFactory().Create("user-1", "Victor", chosen, PlayableCountries(), seed, Now);
+    private static Game Create(long seed = 1, string chosen = "C07") =>
+        new GameFactory().Create("user-1", "Victor", chosen, PlayableCountries(), seed, Now);
 
     [Fact]
     public void Create_BuildsTenTerritoriesAndTenPlayers()
@@ -65,8 +67,7 @@ public class GameFactoryTests
         Assert.Equal(10, game.TurnQueue.Count);
         Assert.Equal(
             game.Players.Select(p => p.Id).OrderBy(x => x),
-            game.TurnQueue.OrderBy(x => x)
-        );
+            game.TurnQueue.OrderBy(x => x));
     }
 
     [Fact]
@@ -120,5 +121,6 @@ public class GameFactoryTests
     }
 
     [Fact]
-    public void Create_ChosenCountryNotPlayable_Throws() => Assert.Throws<ArgumentException>(() => Create(chosen: "ZZ"));
+    public void Create_ChosenCountryNotPlayable_Throws() =>
+        Assert.Throws<ArgumentException>(() => Create(chosen: "ZZ"));
 }
