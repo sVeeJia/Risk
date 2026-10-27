@@ -29,7 +29,8 @@ src/
     game/
       GameMenu.jsx
       GameSetup.jsx
-      assignCountries.js
+      boardAssignments.js
+      boardAssignments.test.js
     map/
       WorldMap.jsx
       worldRegions.js
@@ -67,7 +68,7 @@ src/
 - `components/` contains reusable presentation components.
 - `features/` contains domain-specific components, helpers, data, and tests.
 - `features/countries/` owns country selection and pure filtering, sorting, and pagination.
-- `features/game/` owns the game menu, setup, and pure country assignment.
+- `features/game/` owns the game menu, setup, and mapping server territory slots onto map shapes.
 - `features/map/` owns map rendering and territory data.
 - `pages/` contains route-level page components.
 - `css/` contains the stylesheet entrypoint, existing tokens, and shared document/dialog rules.
@@ -79,4 +80,4 @@ all CSS lives in src/css/.
 
 Only `main.jsx` imports `css/index.css`. That stylesheet imports Tailwind first, followed by tokens, base, components, features, and pages. Shared dialog typography stays in `base.css` so feature overrides retain their existing precedence. No new tokens are introduced.
 
-Verification: `npm run lint`, `npm run build`, and `node --test src/features/countries/filterCountries.test.js`. There is currently no package test script.
+Verification: `npm run lint`, `npm run build`, and `npm test`.

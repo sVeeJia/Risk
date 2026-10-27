@@ -2,8 +2,6 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { getAllCountries, searchCountries } from '../../api/countries.js'
 import { filterCountries } from './filterCountries.js'
-import { assignCountries } from '../game/assignCountries.js'
-import { worldRegions } from '../map/worldRegions.js'
 
 const countries = Array.from({ length: 234 }, (_, index) => ({
   id: String(index), name: `Country ${index}`, population: index + 1000, rank: index + 1, soldiers: index % 9 + 1,
@@ -52,7 +50,7 @@ test('local search, filtering, sorting and paging are immediate and make no requ
   assert.equal(sample[0].id, 'IN', 'sorting must not mutate the source list')
 })
 
-test('random selection pool includes all 234 countries across three API pages', async (t) => {
+test('country roster includes all 234 countries across three API pages', async (t) => {
   const pages = []
   t.mock.method(globalThis, 'fetch', async path => {
     const query = new URL(path, 'http://localhost').searchParams
@@ -66,20 +64,6 @@ test('random selection pool includes all 234 countries across three API pages', 
   const result = await getAllCountries()
   assert.deepEqual(pages.sort(), [1, 2, 3])
   assert.deepEqual(result, countries)
-})
-
-test('every chosen country occupies Territory 1 with nine different countries', () => {
-  for (const selected of countries) {
-    const assignments = assignCountries(countries, selected.id, worldRegions)
-    assert.equal(assignments.length, 10)
-    assert.equal(assignments[0].territoryId, worldRegions[0].id)
-    assert.equal(assignments[0].country.id, selected.id)
-    assert.equal(new Set(assignments.map(item => item.country.id)).size, 10)
-    assert.deepEqual(assignments.map(item => item.territoryId), worldRegions.map(item => item.id))
-  }
-  assert.equal(countries[0].id, '0', 'selection must not shuffle the original country array')
-  assert.throws(() => assignCountries(countries, 'missing', worldRegions), /unavailable/)
-  assert.throws(() => assignCountries(countries.slice(0, 5), '0', worldRegions), /not enough/)
 })
 
 test('country searches preserve cancellation and authentication errors', async (t) => {
