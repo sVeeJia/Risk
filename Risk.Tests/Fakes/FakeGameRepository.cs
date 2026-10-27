@@ -26,4 +26,10 @@ public sealed class FakeGameRepository : IGameRepository
         game.Version++;
         return Task.FromResult(true);
     }
+    
+    public Task<long> DeleteUnplayedAsync(string ownerUserId, CancellationToken ct = default)
+    {
+        var removed = Items.RemoveAll(g => g.OwnerUserId == ownerUserId && g.Version == 0);
+        return Task.FromResult((long)removed);
+    }
 }
