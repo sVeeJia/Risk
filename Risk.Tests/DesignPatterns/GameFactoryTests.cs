@@ -8,13 +8,13 @@ public class GameFactoryTests
 {
     private static readonly DateTime Now = new(2026, 10, 27, 12, 0, 0, DateTimeKind.Utc);
 
-    private static List<Country> Pool() =>
+    private static List<Country> PlayableCountries() =>
         Enumerable.Range(1, 42)
             .Select(i => new Country { Id = $"C{i:00}", Name = $"Country {i}", Population = i * 5_000_000L, Rank = i })
             .ToList();
 
     private static Game Create(long seed = 1, string chosen = "C07") =>
-        new GameFactory().Create("user-1", "Victor", chosen, Pool(), seed, Now);
+        new GameFactory().Create("user-1", "Victor", chosen, PlayableCountries(), seed, Now);
 
     [Fact]
     public void Create_BuildsTenTerritoriesAndTenPlayers()
@@ -49,11 +49,11 @@ public class GameFactoryTests
     public void Create_SoldiersMatchThePopulationTable()
     {
         var game = Create();
-        var pool = Pool().ToDictionary(c => c.Id);
+        var countries = PlayableCountries().ToDictionary(c => c.Id);
 
         foreach (var territory in game.Territories.Values)
         {
-            var expected = SoldierAllocator.GetSoldiers(pool[territory.CountryId].Population);
+            var expected = SoldierAllocator.GetSoldiers(countries[territory.CountryId].Population);
             Assert.Equal(expected, territory.BaseSoldiers);
             Assert.Equal(expected, territory.Soldiers);
         }
@@ -67,8 +67,7 @@ public class GameFactoryTests
         Assert.Equal(10, game.TurnQueue.Count);
         Assert.Equal(
             game.Players.Select(p => p.Id).OrderBy(x => x),
-            game.TurnQueue.OrderBy(x => x)
-        );
+            game.TurnQueue.OrderBy(x => x));
     }
 
     [Fact]
@@ -100,10 +99,10 @@ public class GameFactoryTests
 
         Assert.Equal(a.Territories.Keys, b.Territories.Keys);
 
-        string[] OrderByCountry(Game g) => g.TurnQueue
+        string[] TurnOrderByCountry(Game g) => g.TurnQueue
             .Select(id => g.Players.Single(p => p.Id == id).StartingCountryId)
             .ToArray();
-        Assert.Equal(OrderByCountry(a), OrderByCountry(b));
+        Assert.Equal(TurnOrderByCountry(a), TurnOrderByCountry(b));
     }
 
     [Fact]
@@ -122,5 +121,6 @@ public class GameFactoryTests
     }
 
     [Fact]
-    public void Create_ChosenCountryNotInPool_Throws() => Assert.Throws<ArgumentException>(() => Create(chosen: "ZZ"));
+    public void Create_ChosenCountryNotPlayable_Throws() =>
+        Assert.Throws<ArgumentException>(() => Create(chosen: "ZZ"));
 }

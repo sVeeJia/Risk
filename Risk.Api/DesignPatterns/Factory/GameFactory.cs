@@ -11,14 +11,14 @@ public sealed class GameFactory : IGameFactory
         string ownerUserId,
         string ownerDisplayName,
         string chosenCountryId,
-        IReadOnlyList<Country> pool,
+        IReadOnlyList<Country> playableCountries,
         long seed,
         DateTime nowUtc)
     {
         var random = new SeededRandom(seed);
 
         // Chosen country first, then 9 random ones (no duplicates).
-        var countries = CountryDraw.Draw(chosenCountryId, pool, random);
+        var countries = CountryDraw.Draw(chosenCountryId, playableCountries, random);
 
         var territories = countries.ToDictionary(
             c => c.Id,
