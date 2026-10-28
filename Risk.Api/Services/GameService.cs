@@ -39,6 +39,8 @@ public sealed class GameService : IGameService
         var seed = BitConverter.ToInt64(RandomNumberGenerator.GetBytes(8));
         var game = _factory.Create(userId, displayName, chosen.Id, playableCountries, seed, DateTime.UtcNow);
 
+        // A new game replaces any earlier game this user prepared but never played.
+        await _games.DeleteUnplayedAsync(userId, ct);
         await _games.CreateAsync(game, ct);
         return new StartGameResult(StartGameStatus.Success, game);
     }
