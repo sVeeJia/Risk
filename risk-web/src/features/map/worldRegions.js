@@ -5,7 +5,7 @@ export const regionGroups = [
   { id: 'outer', name: 'Surrounding territories', territoryCount: 7, color: '#729d9a' },
 ]
 
-// Stable irregular coastlines keep the same board while starting order is shuffled.
+// Stable irregular coastlines keep the same board for server-assigned countries.
 // [ID, name, group, label position, color, polygon]
 const territories = [
   ['C1', 'Territory 1', 'center', [369,244], '#0000FF', '330,200 370,188 410,180 430,220 410,250 425,290 390,315 353,297 325,280 310,240'],

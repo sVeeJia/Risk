@@ -48,5 +48,5 @@ async function request(method, path, body, options = {}) {
 
 export const api = {
   get: (path, options) => request('GET', path, undefined, options),
-  post: (path, body) => request('POST', path, body),
+  post: (path, body, options) => request('POST', path, body, options),
 }
