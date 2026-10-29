@@ -54,4 +54,15 @@ public sealed class GamesController : ControllerBase
         var games = await _games.ListAsync(userId, ct);
         return Ok(games.Select(GameMapper.ToSummary).ToList());
     }
+
+    [HttpGet("{id}/events")]
+    public async Task<ActionResult<IReadOnlyList<GameEventResponse>>> Events(string id, [FromQuery] EventQuery query, CancellationToken ct)
+    {
+        var userId = User.FindFirstValue("sub");
+        if (userId is null) return Unauthorized();
+        if (!Guid.TryParse(id, out _)) return NotFound();
+
+        var events = await _games.GetEventsAsync(userId, id, query.After, query.Limit, ct);
+        return events is null ? NotFound() : Ok(events.Select(GameEventMapper.ToResponse).ToList());
+    }
 }
