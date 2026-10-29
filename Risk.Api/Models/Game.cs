@@ -21,4 +21,6 @@ public class Game
     public int Version { get; set; } // optimistic concurrency
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public bool AttackedThisTurn { get; set; } // one attack per turn; reset when a new turn starts
+
 }
