@@ -68,7 +68,7 @@ public sealed class RollAttackCommand : IGameCommand
                 Conquer(game, log, player, attacker, defender);
                 break;
             case BattleStatus.AttackerExhausted:
-                AttackSteps.End(game, log, player, "the attacker is down to 1 soldier.");
+                AttackSteps.End(game, log, player, AttackEndReason.Exhausted);
                 break;
         }
 
@@ -106,7 +106,7 @@ public sealed class RollAttackCommand : IGameCommand
 
         if (player.OwnedCountryIds.Count == game.Territories.Count)
         {
-            AttackSteps.End(game, log, player, "conquest.");
+            AttackSteps.End(game, log, player, AttackEndReason.Conquest);
             game.Phase = GamePhase.Finished;
             game.WinnerPlayerId = player.Id;
             log.Append(

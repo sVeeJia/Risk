@@ -42,7 +42,11 @@ public static class GameMapper
             game.WinnerPlayerId,
             territories,
             players,
-            game.CreatedAt);
+            game.CreatedAt,
+            game.ActiveAttack is null
+                ? null
+                : new AttackResponse(game.ActiveAttack.AttackerCountryId, game.ActiveAttack.DefenderCountryId),
+            game.AttackedThisTurn);
     }
 
     public static GameSummaryResponse ToSummary(Game game)

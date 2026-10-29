@@ -26,7 +26,7 @@ public sealed class StopAttackCommand : IGameCommand
             return CommandResult.Fail("There is no attack in progress.");
         }
 
-        AttackSteps.End(game, log, player, "the attacker stopped.");
+        AttackSteps.End(game, log, player, AttackEndReason.Stopped);
         return CommandResult.Ok();
     }
 }

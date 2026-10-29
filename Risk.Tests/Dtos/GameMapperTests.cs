@@ -45,4 +45,18 @@ public class GameMapperTests
             Assert.Equal(territory.CountryId, owner.StartingCountryId);
         }
     }
+    
+    [Fact]
+    public void ToResponse_ShowsTheActiveAttack_AndWhetherTheTurnsAttackWasUsed()
+    {
+        var game = NewGame();
+        game.ActiveAttack = new AttackState { AttackerCountryId = "C07", DefenderCountryId = "C08" };
+        game.AttackedThisTurn = true;
+
+        var response = GameMapper.ToResponse(game);
+
+        Assert.Equal("C07", response.ActiveAttack!.AttackerCountryId);
+        Assert.Equal("C08", response.ActiveAttack.DefenderCountryId);
+        Assert.True(response.AttackedThisTurn);
+    }
 }

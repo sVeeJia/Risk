@@ -62,7 +62,7 @@ public sealed class TransferAfterConquestCommand : IGameCommand
                 ["soldiers"] = _soldiers.ToString()
             });
 
-        AttackSteps.End(game, log, player, "conquest.");
+        AttackSteps.End(game, log, player, AttackEndReason.Conquest);
         return CommandResult.Ok();
     }
 }

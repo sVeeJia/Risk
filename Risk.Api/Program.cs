@@ -39,6 +39,7 @@ builder.Services.AddSingleton<IGameRepository, GameRepository>();
 builder.Services.AddSingleton<IGameFactory, GameFactory>();
 builder.Services.AddSingleton<IGameService, GameService>();
 builder.Services.AddSingleton<IGameEventRepository, GameEventRepository>();
+builder.Services.AddSingleton<IGameplayService, GameplayService>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");
