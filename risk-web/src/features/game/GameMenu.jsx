@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { ArrowRight, ChevronRight, Flag, Globe2, LogOut, Shield, Swords, Users, X } from 'lucide-react'
 import WorldMap from '../map/WorldMap.jsx'
 import GameSetup from './GameSetup.jsx'
 import { regionGroups, worldRegions } from '../map/worldRegions.js'
 
 export default function GameMenu({ user, onLogout }) {
-  const [briefing, setBriefing] = useState(null)
+  const [searchParams] = useSearchParams()
+  const [briefing, setBriefing] = useState(() => user && searchParams.get('new') === '1' ? 'World conquest' : null)
   const dialog = useRef(null)
   const opener = useRef(null)
   useEffect(() => {
@@ -19,10 +20,10 @@ export default function GameMenu({ user, onLogout }) {
     <header className="game-header">
       <Link to="/" className="brand"><Shield size={27} strokeWidth={1.5} /><span>GEOPOLITICS<small>THE WORLD IS YOURS TO TAKE</small></span></Link>
       <nav aria-label="Main navigation"><span className="nav-active">HEADQUARTERS</span><button onClick={event => openBriefing(event, 'The field manual')}>HOW TO PLAY</button></nav>
-      {user ? <button className="commander" onClick={onLogout}><LogOut size={16} /><span>{user.displayName} Â· Sign out</span></button> : <Link className="commander" to="/login"><Shield size={16} /> COMMANDER LOGIN</Link>}
+      {user ? <button className="commander" onClick={onLogout}><LogOut size={16} /><span>{user.displayName} · Sign out</span></button> : <Link className="commander" to="/login"><Shield size={16} /> COMMANDER LOGIN</Link>}
     </header>
     <main className="command-main">
-      <section className="campaign-intro"><p className="eyebrow"><span /> WORLD CONQUEST Â· TURN-BASED STRATEGY</p><h1>ONE WORLD.<br /><em>ONE VICTOR.</em></h1><p className="intro-copy">Build your army. Forge your alliances.<br />Put your strategy on the map.</p></section>
+      <section className="campaign-intro"><p className="eyebrow"><span /> WORLD CONQUEST · TURN-BASED STRATEGY</p><h1>ONE WORLD.<br /><em>ONE VICTOR.</em></h1><p className="intro-copy">Build your army. Forge your alliances.<br />Put your strategy on the map.</p></section>
       <div className="atlas"><div className="atlas-top"><span><Globe2 size={14} /> WORLD THEATER</span><span>UNCHARTED / 01</span></div><WorldMap /><div className="atlas-bottom"><span>3 CENTRAL + 7 OUTER <i /> {worldRegions.length} TERRITORIES</span><span className="map-key"><b /> MAP PREVIEW</span></div><ul className="continent-legend" aria-label="Territory layout">{regionGroups.map(continent => <li key={continent.id}><span style={{ backgroundColor: continent.color }} /><span>{continent.name}</span><b>{continent.territoryCount}</b></li>)}</ul><p className="sea-route-note">DASHED LINES CONNECT TERRITORIES ACROSS WATER</p></div>
       <section className="command-menu" aria-label="Game menu"><p className="eyebrow">{user ? `WELCOME, ${user.displayName}` : 'YOUR CAMPAIGN STARTS HERE'}</p>
         {user ? <button className="deploy-button" onClick={event => openBriefing(event, 'World conquest')}><Swords size={24} /><span>WORLD CONQUEST<small>Plan your next campaign</small></span><ArrowRight size={22} /></button> : <Link to="/register" className="deploy-button"><Swords size={24} /><span>PLAY NOW<small>Create your commander</small></span><ArrowRight size={22} /></Link>}

@@ -8,8 +8,12 @@
 @import "./components/splash.css";
 @import "./features/country-picker.css";
 @import "./features/world-map.css";
+@import "./features/map-arrows.css";
 @import "./features/game-menu.css";
 @import "./features/game-setup.css";
+@import "./features/action-panel.css";
+@import "./features/game-over.css";
+@import "./features/event-log.css";
 @import "./pages/landing.css";
 @import "./pages/lobby.css";
 @import "./pages/login.css";
