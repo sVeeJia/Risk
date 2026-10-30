@@ -68,6 +68,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
             {
                 context.Token = context.Request.Cookies["risk_auth"];
                 return Task.CompletedTask;
+            },
+            
+            OnChallenge = context =>
+            {
+                // Plain 401, no WWW-Authenticate header.
+                context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
             }
         };
     });
