@@ -40,7 +40,7 @@ describe('toAssignments', () => {
 
   it('uses the server ID/name and population zero if the country is missing', () => {
     const result = toAssignments({ territories }, countries.slice(1), regions)
-    assert.deepEqual(result[0], { territoryId: 'R1', country: { id: 'C1', name: 'Country 1', population: 0, soldiers: 1 } })
+    assert.deepEqual(result[0], { territoryId: 'R1', colorSlot: 1, country: { id: 'C1', name: 'Country 1', population: 0, soldiers: 1 } })
   })
 
   it('throws when the server returns too few or too many territories', () => {
@@ -53,5 +53,17 @@ describe('toAssignments', () => {
       const invalid = [{ ...territories[0], slot }, ...territories.slice(1)]
       assert.throws(() => toAssignments({ territories: invalid }, countries, regions), /invalid territory slots/)
     }
+  })
+  it('updates owner colour without changing conquered country names, positions or soldiers', () => {
+    const game = { players: [{ id: 'human', startingCountryId: 'C1' }, { id: 'npc', startingCountryId: 'C3' }], territories }
+    const before = structuredClone(game)
+    const conquered = { ...game, territories: territories.map(t => ({ ...t, ownerPlayerId: t.slot === 2 ? 'human' : 'npc' })) }
+    const assignments = toAssignments(conquered, countries, regions)
+    assert.equal(assignments[1].colorSlot, 1)
+    assert.equal(assignments[0].colorSlot, 3)
+    assert.equal(assignments[1].territoryId, 'R2')
+    assert.equal(assignments[1].country.name, 'Country 2')
+    assert.equal(assignments[1].country.soldiers, 2)
+    assert.deepEqual(game, before)
   })
 })
