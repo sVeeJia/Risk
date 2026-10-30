@@ -28,7 +28,7 @@ public static class GameMapper
             .ToList();
 
         var players = game.Players
-            .Select(p => new PlayerResponse(p.Id, p.Name, p.IsHuman, p.StartingCountryId, p.OwnedCountryIds.Count, p.IsEliminated))
+            .Select(p => new PlayerResponse(p.Id, p.Name, p.IsHuman, p.StartingCountryId, p.OwnedCountryIds.Count, p.IsEliminated, p.PendingReinforcements))            
             .ToList();
 
         var currentPlayerId = game.TurnQueue.Count > 0 ? game.TurnQueue.Peek() : null;

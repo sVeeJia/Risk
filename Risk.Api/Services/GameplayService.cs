@@ -29,6 +29,15 @@ public sealed class GameplayService : IGameplayService
     public Task<GameplayResult> TransferAfterConquestAsync(string userId, string gameId, int soldiers, CancellationToken ct = default) =>
         ExecuteAsync(userId, gameId, playerId => new TransferAfterConquestCommand(playerId, soldiers), ct);
 
+    public Task<GameplayResult> PlaceReinforcementsAsync(string userId, string gameId, string countryId, int soldiers, CancellationToken ct = default) =>
+        ExecuteAsync(userId, gameId, playerId => new PlaceReinforcementsCommand(playerId, countryId, soldiers), ct);
+
+    public Task<GameplayResult> TransferAsync(string userId, string gameId, string fromCountryId, string toCountryId, int soldiers, CancellationToken ct = default) =>
+        ExecuteAsync(userId, gameId, playerId => new TransferCommand(playerId, fromCountryId, toCountryId, soldiers), ct);
+
+    public Task<GameplayResult> EndTurnAsync(string userId, string gameId, CancellationToken ct = default) =>
+        ExecuteAsync(userId, gameId, playerId => new EndTurnCommand(playerId), ct);
+
     private async Task<GameplayResult> ExecuteAsync(string userId, string gameId, Func<string, IGameCommand> createCommand, CancellationToken ct)
     {
         var game = await _games.GetByIdAsync(gameId, ct);
