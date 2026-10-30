@@ -7,22 +7,14 @@ namespace Risk.Api.DesignPatterns.Factory;
 
 public sealed class GameFactory : IGameFactory
 {
-    public Game Create(
-        string ownerUserId,
-        string ownerDisplayName,
-        string chosenCountryId,
-        IReadOnlyList<Country> playableCountries,
-        long seed,
-        DateTime nowUtc)
+    public Game Create(string ownerUserId, string ownerDisplayName, string chosenCountryId, IReadOnlyList<Country> playableCountries, long seed, DateTime nowUtc)
     {
         var random = new SeededRandom(seed);
 
         // Chosen country first, then 9 random ones (no duplicates).
         var countries = CountryDraw.Draw(chosenCountryId, playableCountries, random);
 
-        var territories = countries.ToDictionary(
-            c => c.Id,
-            c =>
+        var territories = countries.ToDictionary(c => c.Id, c =>
             {
                 var soldiers = SoldierAllocator.GetSoldiers(c.Population);
                 return new Territory
@@ -35,8 +27,7 @@ public sealed class GameFactory : IGameFactory
             });
 
         // Index 0 is the human, the rest are NPCs, one country each.
-        var players = countries
-            .Select((c, index) => new Player
+        var players = countries.Select((c, index) => new Player
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = index == 0 ? ownerDisplayName : $"{c.Name} (NPC)",
@@ -64,7 +55,8 @@ public sealed class GameFactory : IGameFactory
             RngRollsUsed = random.Position,
             Version = 0,
             CreatedAt = nowUtc,
-            UpdatedAt = nowUtc
+            UpdatedAt = nowUtc,
+            RoundStartPlayerId = turnOrder[0],
         };
     }
 }

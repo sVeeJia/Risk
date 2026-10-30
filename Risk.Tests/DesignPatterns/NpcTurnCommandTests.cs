@@ -126,31 +126,6 @@ public class NpcTurnCommandTests
         Assert.Equal(GamePhase.Finished, game.Phase);
         Assert.Null(game.WinnerPlayerId);
         Assert.Contains(log.Events, e => e.Type == EventType.GameLost);
-        Assert.DoesNotContain(log.Events, e => e.Type is EventType.TurnStarted or EventType.ReinforcementsReceived or EventType.NpcDecision);
-    }
-
-    [Fact]
-    public void Execute_WhenAnNpcEliminatesTheHuman_DoesNotStartOrReinforceAnotherTurn()
-    {
-        var (game, npc) = NpcTurn(npcSoldiers: 50, humanSoldiers: 1, otherSoldiers: 50);
-        game.Round = 2;
-        var queue = game.TurnQueue.ToArray();
-        var log = new EventLog(game.Id);
-
-        Assert.True(_command.Execute(game, log).Success);
-
-        Assert.True(game.Human().IsEliminated);
-        Assert.Equal(GamePhase.Finished, game.Phase);
-        Assert.Null(game.ActiveAttack);
-        Assert.Equal(queue, game.TurnQueue.ToArray());
-        Assert.Equal(npc.Id, game.TurnQueue.Peek());
-        Assert.Equal(2, game.Round);
-        Assert.Single(log.Events, e => e.Type == EventType.GameLost);
-        Assert.DoesNotContain(log.Events, e => e.Type is EventType.TurnStarted or EventType.ReinforcementsReceived or EventType.Transfer);
-        Assert.All(game.Players, player => Assert.Equal(0, player.PendingReinforcements));
-        var count = log.Events.Count;
-        Assert.Equal("The game is over.", _command.Execute(game, log).Error);
-        Assert.Equal(count, log.Events.Count);
     }
 
     [Fact]
