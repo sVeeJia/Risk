@@ -1,5 +1,15 @@
-.game-button { border-radius: 2px; }
-.game-button-primary { color: #17201c; background: #cbaa6a; border: 1px solid #e0c68f; }
-.game-button-primary:hover { background: #e0c18a; }
-.game-button-secondary { color: #d3d4c4; border: 1px solid #6d7a68; background: #263431; }
-.game-button-danger { color: white; background: #a1453e; }
+.game-button { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; border: 1px solid transparent; border-radius: 4px; font: 500 14px/1.3 Arial, sans-serif; text-align: center; cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease; }
+.game-button-regular { min-height: 44px; padding: 10px 14px; }
+.game-button-small { min-height: 32px; padding: 6px 8px; font-size: 12px; }
+.game-button-icon { width: 44px; height: 44px; flex: 0 0 44px; padding: 0; font-size: 20px; touch-action: manipulation; user-select: none; }
+.game-button-primary { color: #172325; background: #c6ae7e; border-color: #c6ae7e; }
+.game-button-secondary { color: #c6cdbe; background: transparent; border-color: #52645b; }
+.game-button-danger { color: #ef9a8a; background: #a1453e12; border-color: #a1453e; }
+.game-button-primary:hover:not(:disabled) { background: #e0c38c; border-color: #e0c38c; }
+.game-button-secondary:hover:not(:disabled) { background: #ffffff0d; border-color: #899b90; }
+.game-button-danger:hover:not(:disabled) { background: #a1453e30; }
+.game-button:active:not(:disabled) { transform: translateY(1px); }
+.game-button:focus:not(:focus-visible) { outline: none; box-shadow: none; }
+.game-button:focus-visible { outline: 2px solid #c6ae7e; outline-offset: 2px; }
+.game-button:disabled, .game-button[aria-busy="true"], fieldset:disabled .game-button { opacity: .5; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { .game-button { transition: none; } .game-button:active:not(:disabled) { transform: none; } }

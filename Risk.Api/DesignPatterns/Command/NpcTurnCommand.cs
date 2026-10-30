@@ -28,13 +28,16 @@ public sealed class NpcTurnCommand : IGameCommand
             return CommandResult.Fail("It is your turn.");
         }
 
+        // Older saves may already have an eliminated human. Do not play another turn.
+        EndTheGameIfTheHumanIsOut(game, log);
+        if (game.Phase == GamePhase.Finished) return CommandResult.Ok();
+
         var error = Play(game, log, npc);
         if (error is not null) 
         {
             return CommandResult.Fail(error);
         }
 
-        EndTheGameIfTheHumanIsOut(game, log);
         return CommandResult.Ok();
     }
 

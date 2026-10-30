@@ -1,0 +1,11 @@
+.game-over { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 16px; height: 100%; }
+.game-over-info { min-height: 0; overflow-y: auto; }
+.game-over h2 { color: #e0c38c; font: 20px Georgia, serif; margin: 4px 0; }
+.game-over p { font-size: 12px; margin: 4px 0; }
+.game-over h3 { font-size: 12px; margin: 6px 0; }
+.game-over ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; list-style: none; padding: 0; margin: 0; }
+.game-over li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid #52645b; font-size: 11px; }
+.game-over li span { min-width: 0; overflow-wrap: anywhere; }
+.game-over-links { display: grid; align-content: end; gap: 8px; min-width: 0; }
+.game-over-links .game-button { width: 100%; }
+@media (max-width: 759px) { .game-over { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; } }
