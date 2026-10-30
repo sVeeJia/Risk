@@ -30,4 +30,5 @@ public interface IGameplayService
     Task<GameplayResult> PlaceReinforcementsAsync(string userId, string gameId, string countryId, int soldiers, CancellationToken ct = default);
     Task<GameplayResult> TransferAsync(string userId, string gameId, string fromCountryId, string toCountryId, int soldiers, CancellationToken ct = default);
     Task<GameplayResult> EndTurnAsync(string userId, string gameId, CancellationToken ct = default);
+    Task<GameplayResult> PlayNpcTurnAsync(string userId, string gameId, CancellationToken ct = default);
 }

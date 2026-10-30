@@ -5,6 +5,8 @@ using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.DesignPatterns.Repository;
 using Risk.Api.DesignPatterns.Factory.Interfaces;
 using Risk.Api.DesignPatterns.Factory;
+using Risk.Api.DesignPatterns.Strategy;
+using Risk.Api.DesignPatterns.Strategy.Interfaces;
 using Risk.Api.Services;
 using Risk.Api.Services.Interfaces;
 using System.Text;
@@ -40,6 +42,7 @@ builder.Services.AddSingleton<IGameFactory, GameFactory>();
 builder.Services.AddSingleton<IGameService, GameService>();
 builder.Services.AddSingleton<IGameEventRepository, GameEventRepository>();
 builder.Services.AddSingleton<IGameplayService, GameplayService>();
+builder.Services.AddSingleton<INpcStrategy, OpportunistStrategy>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");

@@ -1,3 +1,4 @@
+using Risk.Api.DesignPatterns.Strategy;
 using Risk.Api.Models;
 using Risk.Api.Services;
 using Risk.Api.Services.Interfaces;
@@ -14,7 +15,7 @@ public class GameplayTurnFlowTests
     private readonly FakeGameEventRepository _events = new();
     private readonly GameplayService _service;
 
-    public GameplayTurnFlowTests() => _service = new GameplayService(_games, _events);
+    public GameplayTurnFlowTests() => _service = new GameplayService(_games, _events, new OpportunistStrategy());
 
     private async Task<Game> SavedGame(Action<Game>? change = null)
     {
@@ -130,5 +131,37 @@ public class GameplayTurnFlowTests
         var result = await _service.TransferAsync(UserId, game.Id, game.Human().StartingCountryId, game.EnemyCountry(), 1);
 
         Assert.Equal(GameplayStatus.Conflict, result.Status);
+    }
+
+    [Fact]
+    public async Task PlayNpcTurnAsync_OnTheHumansTurn_IsRejected()
+    {
+        var game = await SavedGame();
+
+        var result = await _service.PlayNpcTurnAsync(UserId, game.Id);
+
+        Assert.Equal(GameplayStatus.Rejected, result.Status);
+    }
+
+    [Fact]
+    public async Task PlayNpcTurnAsync_PlaysTheTurn_AndSavesTheEvents()
+    {
+        var game = await SavedGame(g => g.GiveTurnToAnNpc());
+
+        var result = await _service.PlayNpcTurnAsync(UserId, game.Id);
+
+        Assert.Equal(GameplayStatus.Success, result.Status);
+        Assert.Contains(result.Events!, e => e.Type == EventType.NpcDecision);
+        Assert.True(await _events.GetLastSequenceAsync(game.Id) > 0);
+    }
+
+    [Fact]
+    public async Task PlayNpcTurnAsync_ForSomeoneElsesGame_IsNotFound()
+    {
+        var game = await SavedGame(g => g.GiveTurnToAnNpc());
+
+        var result = await _service.PlayNpcTurnAsync("another-user", game.Id);
+
+        Assert.Equal(GameplayStatus.NotFound, result.Status);
     }
 }
