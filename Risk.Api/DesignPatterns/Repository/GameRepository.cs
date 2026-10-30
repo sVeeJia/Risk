@@ -44,4 +44,14 @@ public sealed class GameRepository : IGameRepository
         }
         return true;
     }
+
+    public async Task<IReadOnlyList<string>> DeleteUnplayedAsync(string ownerUserId, CancellationToken ct = default)
+    {
+        var unplayed = Builders<Game>.Filter.Where(g => g.OwnerUserId == ownerUserId && g.Version == 0);
+        var ids = await _games.Find(unplayed).Project(g => g.Id).ToListAsync(ct);
+        if (ids.Count == 0) return ids;
+
+        await _games.DeleteManyAsync(Builders<Game>.Filter.In(g => g.Id, ids), ct);
+        return ids;
+    }
 }

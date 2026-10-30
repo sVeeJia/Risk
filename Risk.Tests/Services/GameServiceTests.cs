@@ -9,8 +9,7 @@ namespace Risk.Tests.Services;
 
 public class GameServiceTests
 {
-    private static (GameService Service, FakeGameRepository Games) Create(
-        int countryCount = 60, int playableCountries = 42)
+    private static (GameService Service, FakeGameRepository Games) Create(int countryCount = 60, int playableCountries = 42, FakeGameEventRepository? events = null)
     {
         var countries = new FakeCountryRepository();
         countries.Items.AddRange(Enumerable.Range(1, countryCount).Select(i => new Country
@@ -29,7 +28,7 @@ public class GameServiceTests
             })
             .Build();
 
-        return (new GameService(countries, games, new GameFactory(), config), games);
+        return (new GameService(countries, games, events ?? new FakeGameEventRepository(), new GameFactory(), config), games);
     }
 
     [Fact]
@@ -113,5 +112,110 @@ public class GameServiceTests
         var list = await service.ListAsync("user-1");
 
         Assert.Equal(new[] { "new", "old" }, list.Select(g => g.Id));
+    }
+
+    [Fact]
+    public async Task StartGame_ReplacesTheUsersUnplayedGame()
+    {
+        var (service, games) = Create();
+
+        await service.StartGameAsync("user-1", "Victor", "C07");
+        var second = await service.StartGameAsync("user-1", "Victor", "C08");
+
+        var remaining = Assert.Single(games.Items);
+        Assert.Equal(second.Game!.Id, remaining.Id);
+    }
+
+    [Fact]
+    public async Task StartGame_KeepsGamesThatHaveBeenPlayed()
+    {
+        var (service, games) = Create();
+        await service.StartGameAsync("user-1", "Victor", "C07");
+        games.Items[0].Version = 3; // an action has been saved
+
+        await service.StartGameAsync("user-1", "Victor", "C08");
+
+        Assert.Equal(2, games.Items.Count);
+    }
+
+    [Fact]
+    public async Task StartGame_DoesNotTouchOtherUsersGames()
+    {
+        var (service, games) = Create();
+        games.Items.Add(new Game { Id = "other", OwnerUserId = "user-2", Version = 0 });
+
+        await service.StartGameAsync("user-1", "Victor", "C07");
+
+        Assert.Contains(games.Items, g => g.Id == "other");
+    }
+
+    [Fact]
+    public async Task StartGame_InvalidCountry_DoesNotDeleteAnything()
+    {
+        var (service, games) = Create();
+        await service.StartGameAsync("user-1", "Victor", "C07");
+
+        await service.StartGameAsync("user-1", "Victor", "ZZ");
+
+        Assert.Single(games.Items);
+    }
+
+        [Fact]
+    public async Task StartGame_WritesGameStartedAndTurnStartedEvents()
+    {
+        var events = new FakeGameEventRepository();
+        var (service, _) = Create(events: events);
+
+        var result = await service.StartGameAsync("user-1", "Victor", "C07");
+
+        Assert.Equal(new[] { 1, 2 }, events.Items.Select(e => e.Sequence));
+        Assert.Equal(EventType.GameStarted, events.Items[0].Type);
+        Assert.Equal(EventType.TurnStarted, events.Items[1].Type);
+        Assert.Equal(result.Game!.TurnQueue.Peek(), events.Items[1].PlayerId);
+        Assert.All(events.Items, e => Assert.Equal(result.Game.Id, e.GameId));
+    }
+
+    [Fact]
+    public async Task StartGame_ReplacingAnUnplayedGame_DeletesItsEvents()
+    {
+        var events = new FakeGameEventRepository();
+        var (service, _) = Create(events: events);
+
+        await service.StartGameAsync("user-1", "Victor", "C07");
+        var second = await service.StartGameAsync("user-1", "Victor", "C08");
+
+        Assert.Equal(2, events.Items.Count);
+        Assert.All(events.Items, e => Assert.Equal(second.Game!.Id, e.GameId));
+    }
+
+    [Fact]
+    public async Task GetEvents_Owner_ReturnsTheEventsInOrder()
+    {
+        var (service, _) = Create();
+        var started = await service.StartGameAsync("user-1", "Victor", "C07");
+
+        var events = await service.GetEventsAsync("user-1", started.Game!.Id, 0, 200);
+
+        Assert.Equal(new[] { 1, 2 }, events!.Select(e => e.Sequence));
+    }
+
+    [Fact]
+    public async Task GetEvents_AfterSequence_SkipsEarlierEvents()
+    {
+        var (service, _) = Create();
+        var started = await service.StartGameAsync("user-1", "Victor", "C07");
+
+        var events = await service.GetEventsAsync("user-1", started.Game!.Id, 1, 200);
+
+        Assert.Equal(new[] { 2 }, events!.Select(e => e.Sequence));
+    }
+
+    [Fact]
+    public async Task GetEvents_AnotherUser_ReturnsNull()
+    {
+        var (service, _) = Create();
+        var started = await service.StartGameAsync("user-1", "Victor", "C07");
+
+        Assert.Null(await service.GetEventsAsync("user-2", started.Game!.Id, 0, 200));
     }
 }

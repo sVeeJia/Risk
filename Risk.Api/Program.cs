@@ -5,6 +5,8 @@ using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.DesignPatterns.Repository;
 using Risk.Api.DesignPatterns.Factory.Interfaces;
 using Risk.Api.DesignPatterns.Factory;
+using Risk.Api.DesignPatterns.Strategy;
+using Risk.Api.DesignPatterns.Strategy.Interfaces;
 using Risk.Api.Services;
 using Risk.Api.Services.Interfaces;
 using System.Text;
@@ -19,7 +21,6 @@ using Risk.Api.Data.Import;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -39,13 +40,14 @@ builder.Services.AddSingleton<ICountryService, CountryService>();
 builder.Services.AddSingleton<IGameRepository, GameRepository>();
 builder.Services.AddSingleton<IGameFactory, GameFactory>();
 builder.Services.AddSingleton<IGameService, GameService>();
+builder.Services.AddSingleton<IGameEventRepository, GameEventRepository>();
+builder.Services.AddSingleton<IGameplayService, GameplayService>();
+builder.Services.AddSingleton<INpcStrategy, OpportunistStrategy>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");
 
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     {
         options.MapInboundClaims = false; // keep "sub", "name", "email" exactly as written in the token
         options.TokenValidationParameters = new TokenValidationParameters
@@ -69,14 +71,21 @@ builder.Services
             {
                 context.Token = context.Request.Cookies["risk_auth"];
                 return Task.CompletedTask;
+            },
+            
+            OnChallenge = context =>
+            {
+                // Plain 401, no WWW-Authenticate header.
+                context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
             }
         };
     });
 
 builder.Services.AddAuthorization();
 
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? new[] { "http://localhost:5173" };
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
 
 builder.Services.AddCors(options =>
 {
