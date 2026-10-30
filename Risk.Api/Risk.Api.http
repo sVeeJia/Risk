@@ -1,4 +1,7 @@
 @Risk.Api_HostAddress = http://localhost:5270
+@gameId = cfd6a2a6-715e-4478-aa47-29020af941c4
+@fromCountry = CN
+@toCountry = SL
 
 ### Check the Mongo connection
 GET {{Risk.Api_HostAddress}}/health/db
@@ -65,3 +68,26 @@ GET {{Risk.Api_HostAddress}}/api/auth/me
 
 ### Logout
 POST {{Risk.Api_HostAddress}}/api/auth/logout
+
+###  Attack flow (log in as the game's owner first)
+
+### Start an attack (expect 200, phase "Attacking", an activeAttack)
+POST {{Risk.Api_HostAddress}}/api/games/{{gameId}}/attack
+Content-Type: application/json
+
+{ "fromCountryId": "{{fromCountry}}", "toCountryId": "{{toCountry}}" }
+
+### Roll (send repeatedly)
+POST {{Risk.Api_HostAddress}}/api/games/{{gameId}}/attack/roll
+
+### Stop the attack
+POST {{Risk.Api_HostAddress}}/api/games/{{gameId}}/attack/stop
+
+### Transfer soldiers after a conquest (phase goes ConquestTransfer -> Action)
+POST {{Risk.Api_HostAddress}}/api/games/{{gameId}}/attack/transfer
+Content-Type: application/json
+
+{ "soldiers": 1 }
+
+### Full event log
+GET {{Risk.Api_HostAddress}}/api/games/{{gameId}}/events

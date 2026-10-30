@@ -1,0 +1,13 @@
+.world-map { display: block; width: 100%; overflow: visible; }
+.continent { stroke: #182b2d; stroke-width: 2; stroke-linejoin: round; filter: drop-shadow(0 5px 0 #070e1055); }
+.map-orbit { fill: none; stroke: #779a9e; stroke-opacity: .13; }
+.map-route { fill: none; stroke: #d7bf83; stroke-width: 1.5; stroke-opacity: .75; stroke-dasharray: 4 5; }
+.map-labels { fill: #b0bbb0; font: 8px monospace; letter-spacing: 2px; }
+.ocean-label { fill: #577272; font-size: 7px; }
+.region-label { fill: #fff5d9; font: bold 11px Arial, sans-serif; paint-order: stroke; stroke: #142426; stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.region-inactive { opacity: .22; }
+.region-start .continent { stroke: #ffe1a1; stroke-width: 3; }
+.fictional-map .continent { stroke-width: 3; }
+.fictional-map .region-label { font-size: 12px; letter-spacing: .15px; }
+.fictional-region-code { fill: #fff5d9; paint-order: stroke; stroke: #142426; stroke-width: 2px; stroke-linejoin: round; font: bold 8px monospace; letter-spacing: 1px; pointer-events: none; }
+.fictional-map .region-start .continent { stroke-width: 4; }

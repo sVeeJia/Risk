@@ -3,6 +3,8 @@ using MongoDB.Driver;
 using Risk.Api.DesignPatterns;
 using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.DesignPatterns.Repository;
+using Risk.Api.DesignPatterns.Factory.Interfaces;
+using Risk.Api.DesignPatterns.Factory;
 using Risk.Api.Services;
 using Risk.Api.Services.Interfaces;
 using System.Text;
@@ -10,11 +12,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
+using Risk.Api.Data;
+using Risk.Api.Data.Import;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -27,13 +31,20 @@ builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnection));
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
+builder.Services.AddSingleton<ICountrySource>(_ => new ExcelCountrySource(Path.Combine(AppContext.BaseDirectory, "Data", "SeedData", "CountriesPopulationForRisk.xlsx")));
+builder.Services.AddSingleton<ICountryRepository, CountryRepository>();
+builder.Services.AddSingleton<CountrySeeder>();
+builder.Services.AddSingleton<ICountryService, CountryService>();
+builder.Services.AddSingleton<IGameRepository, GameRepository>();
+builder.Services.AddSingleton<IGameFactory, GameFactory>();
+builder.Services.AddSingleton<IGameService, GameService>();
+builder.Services.AddSingleton<IGameEventRepository, GameEventRepository>();
+builder.Services.AddSingleton<IGameplayService, GameplayService>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");
 
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     {
         options.MapInboundClaims = false; // keep "sub", "name", "email" exactly as written in the token
         options.TokenValidationParameters = new TokenValidationParameters
@@ -71,8 +82,7 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? new[] { "http://localhost:5173" };
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
 
 builder.Services.AddCors(options =>
 {
@@ -127,5 +137,7 @@ app.MapGet("/health/db", async (IMongoClient client) =>
     await client.GetDatabase("admin").RunCommandAsync<BsonDocument>(new BsonDocument("ping", 1));
     return Results.Ok("Mongo connected");
 });
+
+await app.Services.GetRequiredService<CountrySeeder>().SeedAsync();
 
 app.Run();

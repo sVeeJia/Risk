@@ -15,10 +15,12 @@ public class Game
     public AttackState? ActiveAttack { get; set; }
     public string? WinnerPlayerId { get; set; }
 
-    public int RngSeed { get; set; } // never sent to viewers while in progress
-    public int RngRollsUsed { get; set; } // lets the dice resume exactly where they left off
+    public long RngSeed { get; set; } // never sent to viewers while in progress
+    public long RngRollsUsed { get; set; } // lets the dice resume exactly where they left off
 
     public int Version { get; set; } // optimistic concurrency
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public bool AttackedThisTurn { get; set; } // one attack per turn; reset when a new turn starts
+
 }

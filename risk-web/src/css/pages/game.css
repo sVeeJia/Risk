@@ -1,0 +1,20 @@
+.game-page { min-height: 100svh; max-width: 1600px; margin: 0 auto; padding: 28px 5%; }
+.game-page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding-bottom: 22px; border-bottom: 1px solid #ffffff14; }
+.game-page-header h1 { margin: 0; color: #e0c38c; font: 28px Georgia, serif; }
+.game-page-back { display: inline-flex; align-items: center; gap: 8px; color: #c6ae7e; font-size: 13px; }
+.game-page-back:hover { color: #e0c38c; }
+.game-page-round { color: #94a09e; font-size: 12px; }
+.game-page-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; margin-top: 28px; }
+.game-page-board { min-width: 0; padding: 20px; border: 1px solid #52645b; background: #172325; }
+.game-page-panel { min-width: 0; padding: 22px; border: 1px solid #52645b; background: #172325; }
+.game-page-panel > .eyebrow { margin: 0 0 12px; }
+.game-page-turn { margin: 0 0 10px; font-size: 22px; color: #e0c38c; }
+.game-page-note { margin: 0 0 28px; font-size: 12px; line-height: 1.7; color: #899b90; }
+.game-page-players { list-style: none; padding: 0; margin: 0; }
+.game-page-players li { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 10px 6px; border-top: 1px solid #ffffff12; font-size: 12px; }
+.game-page-players strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.game-page-player-current { background: #c6a66c12; color: #e0c38c; }
+.game-page-message { max-width: 520px; margin: 15svh auto; padding: 28px; border: 1px solid #52645b; background: #172325; color: #c6cdbe; text-align: center; }
+.game-page-message a { display: inline-block; color: #e0c38c; margin-top: 12px; }
+@media (max-width: 1000px) { .game-page-layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 500px) { .game-page { padding: 20px 4%; } .game-page-header { gap: 14px; } .game-page-header h1 { font-size: 24px; } .game-page-board { padding: 8px; } .game-page-panel { padding: 16px; } }

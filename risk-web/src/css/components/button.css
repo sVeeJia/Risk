@@ -1,0 +1,5 @@
+.game-button { border-radius: 2px; }
+.game-button-primary { color: #17201c; background: #cbaa6a; border: 1px solid #e0c68f; }
+.game-button-primary:hover { background: #e0c18a; }
+.game-button-secondary { color: #d3d4c4; border: 1px solid #6d7a68; background: #263431; }
+.game-button-danger { color: white; background: #a1453e; }
