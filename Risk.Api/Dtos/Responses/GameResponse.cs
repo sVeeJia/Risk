@@ -16,6 +16,8 @@ public sealed record PlayerResponse(
     int CountriesOwned,
     bool IsEliminated);
 
+public sealed record AttackResponse(string AttackerCountryId, string DefenderCountryId);
+
 public sealed record GameResponse(
     string Id,
     string Phase,
@@ -24,4 +26,6 @@ public sealed record GameResponse(
     string? WinnerPlayerId,
     IReadOnlyList<TerritoryResponse> Territories,
     IReadOnlyList<PlayerResponse> Players,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    AttackResponse? ActiveAttack,
+    bool AttackedThisTurn);

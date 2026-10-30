@@ -6,7 +6,8 @@ namespace Risk.Tests.Fakes;
 public sealed class FakeGameRepository : IGameRepository
 {
     public List<Game> Items { get; } = new();
-
+    public bool FailNextUpdate { get; set; }
+    
     public Task CreateAsync(Game game, CancellationToken ct = default)
     {
         Items.Add(game);
@@ -22,6 +23,12 @@ public sealed class FakeGameRepository : IGameRepository
 
     public Task<bool> UpdateAsync(Game game, CancellationToken ct = default)
     {
+        if (FailNextUpdate)
+        {
+            FailNextUpdate = false;
+            return Task.FromResult(false);
+        }
+
         if (!Items.Any(g => g.Id == game.Id)) return Task.FromResult(false);
         game.Version++;
         return Task.FromResult(true);

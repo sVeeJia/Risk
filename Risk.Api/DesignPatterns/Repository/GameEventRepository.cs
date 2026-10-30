@@ -28,12 +28,11 @@ public sealed class GameEventRepository : IGameEventRepository
         }
     }
 
-    public async Task<IReadOnlyList<GameEvent>> ListAsync(
-        string gameId, int afterSequence, int limit, CancellationToken ct = default) =>
-        await _events.Find(e => e.GameId == gameId && e.Sequence > afterSequence)
-                     .SortBy(e => e.Sequence)
-                     .Limit(limit)
-                     .ToListAsync(ct);
+    public async Task<IReadOnlyList<GameEvent>> ListAsync(string gameId, int afterSequence, int limit, CancellationToken ct = default) =>
+    await _events.Find(e => e.GameId == gameId && e.Sequence > afterSequence)
+        .SortBy(e => e.Sequence)
+        .Limit(limit)
+        .ToListAsync(ct);
 
     public async Task DeleteByGamesAsync(IEnumerable<string> gameIds, CancellationToken ct = default)
     {
@@ -41,4 +40,10 @@ public sealed class GameEventRepository : IGameEventRepository
         if (ids.Count == 0) return;
         await _events.DeleteManyAsync(Builders<GameEvent>.Filter.In(e => e.GameId, ids), ct);
     }
+    public async Task<int> GetLastSequenceAsync(string gameId, CancellationToken ct = default) =>
+    await _events.Find(e => e.GameId == gameId)
+        .SortByDescending(e => e.Sequence)
+        .Limit(1)
+        .Project(e => e.Sequence)
+        .FirstOrDefaultAsync(ct);
 }

@@ -11,4 +11,7 @@ public interface IGameEventRepository
 
     // Used only when a game itself is deleted.
     Task DeleteByGamesAsync(IEnumerable<string> gameIds, CancellationToken ct = default);
+    
+    // The highest sequence number saved for the game, or 0 when it has no events.
+    Task<int> GetLastSequenceAsync(string gameId, CancellationToken ct = default);
 }

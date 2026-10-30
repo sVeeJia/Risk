@@ -13,12 +13,11 @@ public sealed class FakeGameEventRepository : IGameEventRepository
         return Task.CompletedTask;
     }
 
-    public Task<IReadOnlyList<GameEvent>> ListAsync(
-        string gameId, int afterSequence, int limit, CancellationToken ct = default) =>
+    public Task<IReadOnlyList<GameEvent>> ListAsync(string gameId, int afterSequence, int limit, CancellationToken ct = default) =>
         Task.FromResult<IReadOnlyList<GameEvent>>(Items.Where(e => e.GameId == gameId && e.Sequence > afterSequence)
-                 .OrderBy(e => e.Sequence)
-                 .Take(limit)
-                 .ToList());
+            .OrderBy(e => e.Sequence)
+            .Take(limit)
+            .ToList());
 
     public Task DeleteByGamesAsync(IEnumerable<string> gameIds, CancellationToken ct = default)
     {
@@ -26,4 +25,6 @@ public sealed class FakeGameEventRepository : IGameEventRepository
         Items.RemoveAll(e => ids.Contains(e.GameId));
         return Task.CompletedTask;
     }
+    public Task<int> GetLastSequenceAsync(string gameId, CancellationToken ct = default) =>
+        Task.FromResult(Items.Where(e => e.GameId == gameId).Select(e => e.Sequence).DefaultIfEmpty(0).Max());
 }

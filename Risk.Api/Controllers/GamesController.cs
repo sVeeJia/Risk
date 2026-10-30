@@ -28,7 +28,7 @@ public sealed class GamesController : ControllerBase
 
         if (result.Status == StartGameStatus.InvalidCountry)
         {
-            return BadRequest("That country is not available for play.");           
+            return BadRequest(new { message = "That country is not available for play." });         
         }
 
         return CreatedAtAction(nameof(Get), new { id = result.Game!.Id }, GameMapper.ToResponse(result.Game));
