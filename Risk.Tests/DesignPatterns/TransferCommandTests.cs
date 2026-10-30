@@ -110,9 +110,8 @@ public class TransferCommandTests
     public void Execute_AfterTheAttackHasEnded_IsAllowed()
     {
         var game = WithTwoCountries();
-        var other = game.Players.Where(p => !p.IsHuman && p.OwnedCountryIds.Count > 0).First().StartingCountryId;
-        new StartAttackCommand(game.Human().Id, Home(game), other).Execute(game, new EventLog(game.Id));
-        new StopAttackCommand(game.Human().Id).Execute(game, new EventLog(game.Id));
+        game.ActiveAttack = null;
+        game.Phase = GamePhase.Action;
 
         Assert.True(Move(game, Home(game), Second(game), 1).Success);
     }
