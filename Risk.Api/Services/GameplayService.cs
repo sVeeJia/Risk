@@ -3,6 +3,7 @@ using Risk.Api.DesignPatterns.Command;
 using Risk.Api.DesignPatterns.Command.Interfaces;
 using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.Services.Interfaces;
+using Risk.Api.DesignPatterns.Strategy.Interfaces;
 
 namespace Risk.Api.Services;
 
@@ -10,11 +11,13 @@ public sealed class GameplayService : IGameplayService
 {
     private readonly IGameRepository _games;
     private readonly IGameEventRepository _events;
+    private readonly INpcStrategy _npcStrategy;
 
-    public GameplayService(IGameRepository games, IGameEventRepository events)
+    public GameplayService(IGameRepository games, IGameEventRepository events, INpcStrategy npcStrategy)
     {
         _games = games;
         _events = events;
+        _npcStrategy = npcStrategy;
     }
 
     public Task<GameplayResult> StartAttackAsync(string userId, string gameId, string fromCountryId, string toCountryId, CancellationToken ct = default) =>
@@ -37,6 +40,9 @@ public sealed class GameplayService : IGameplayService
 
     public Task<GameplayResult> EndTurnAsync(string userId, string gameId, CancellationToken ct = default) =>
         ExecuteAsync(userId, gameId, playerId => new EndTurnCommand(playerId), ct);
+
+    public Task<GameplayResult> PlayNpcTurnAsync(string userId, string gameId, CancellationToken ct = default) =>
+        ExecuteAsync(userId, gameId, _ => new NpcTurnCommand(_npcStrategy), ct);
 
     private async Task<GameplayResult> ExecuteAsync(string userId, string gameId, Func<string, IGameCommand> createCommand, CancellationToken ct)
     {

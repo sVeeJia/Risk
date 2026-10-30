@@ -45,6 +45,10 @@ public sealed class GameActionsController : ControllerBase
     public Task<ActionResult<ActionResponse>> EndTurn(string id, CancellationToken ct) =>
         Run(id, userId => _gameplay.EndTurnAsync(userId, id, ct));
         
+    [HttpPost("npc-turn")]
+    public Task<ActionResult<ActionResponse>> NpcTurn(string id, CancellationToken ct) =>
+        Run(id, userId => _gameplay.PlayNpcTurnAsync(userId, id, ct));
+        
     private async Task<ActionResult<ActionResponse>> Run(string id, Func<string, Task<GameplayResult>> action)
     {
         var userId = User.FindFirstValue("sub");

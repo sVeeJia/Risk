@@ -1,5 +1,6 @@
 using Risk.Api.DataStructures;
 using Risk.Api.DesignPatterns.Command;
+using Risk.Api.DesignPatterns.Strategy;
 using Risk.Api.Models;
 using Risk.Api.Services;
 using Risk.Api.Services.Interfaces;
@@ -14,7 +15,7 @@ public class GameplayServiceTests
     private readonly FakeGameEventRepository _events = new();
     private readonly GameplayService _service;
 
-    public GameplayServiceTests() => _service = new GameplayService(_games, _events);
+    public GameplayServiceTests() => _service = new GameplayService(_games, _events, new OpportunistStrategy());
 
     // A saved game owned by user-1 where the human plays first.
     private Game SavedGame(int humanSoldiers = 5, int enemySoldiers = 3)
