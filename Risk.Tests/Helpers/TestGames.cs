@@ -17,7 +17,8 @@ public static class TestGames
 
         var human = game.Human();
         game.TurnQueue = new Queue<string>(new[] { human.Id }.Concat(game.Players.Where(p => !p.IsHuman).Select(p => p.Id)));
-
+        game.RoundStartPlayerId = human.Id;
+        
         foreach (var territory in game.Territories.Values) 
         {
             territory.Soldiers = territory.CountryId == human.StartingCountryId ? humanSoldiers : enemySoldiers;

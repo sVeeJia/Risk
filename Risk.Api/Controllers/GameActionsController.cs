@@ -33,6 +33,18 @@ public sealed class GameActionsController : ControllerBase
     public Task<ActionResult<ActionResponse>> Transfer(string id, [FromBody] MoveSoldiers request, CancellationToken ct) =>
         Run(id, userId => _gameplay.TransferAfterConquestAsync(userId, id, request.Soldiers, ct));
 
+    [HttpPost("reinforcements")]
+    public Task<ActionResult<ActionResponse>> Reinforce(string id, [FromBody] PlaceReinforcements request, CancellationToken ct) =>
+        Run(id, userId => _gameplay.PlaceReinforcementsAsync(userId, id, request.CountryId, request.Soldiers, ct));
+
+    [HttpPost("transfer")]
+    public Task<ActionResult<ActionResponse>> MoveSoldiers(string id, [FromBody] TransferSoldiers request, CancellationToken ct) =>
+        Run(id, userId => _gameplay.TransferAsync(userId, id, request.FromCountryId, request.ToCountryId, request.Soldiers, ct));
+
+    [HttpPost("end-turn")]
+    public Task<ActionResult<ActionResponse>> EndTurn(string id, CancellationToken ct) =>
+        Run(id, userId => _gameplay.EndTurnAsync(userId, id, ct));
+        
     private async Task<ActionResult<ActionResponse>> Run(string id, Func<string, Task<GameplayResult>> action)
     {
         var userId = User.FindFirstValue("sub");

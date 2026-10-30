@@ -11,4 +11,7 @@ public sealed class ConquestTransferState : IGamePhaseState
     public string? CheckCanRoll() => MoveFirst;
     public string? CheckCanStopAttack() => MoveFirst;
     public string? CheckCanTransferAfterConquest() => null;
+    public string? CheckCanPlaceReinforcements() => "You have no reinforcements to place.";
+    public string? CheckCanTransfer() => MoveFirst;
+    public string? CheckCanEndTurn() => MoveFirst;
 }

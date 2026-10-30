@@ -14,7 +14,8 @@ public sealed record PlayerResponse(
     bool IsHuman,
     string StartingCountryId,
     int CountriesOwned,
-    bool IsEliminated);
+    bool IsEliminated,
+    int PendingReinforcements);
 
 public sealed record AttackResponse(string AttackerCountryId, string DefenderCountryId);
 
