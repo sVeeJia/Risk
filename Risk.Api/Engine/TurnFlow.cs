@@ -10,6 +10,8 @@ public static class TurnFlow
     // Ends the current player's turn and starts the next active player's turn.
     public static void Advance(Game game, EventLog log)
     {
+        if (game.Phase == GamePhase.Finished) return;
+
         var finished = game.TurnQueue.Dequeue();
         game.TurnQueue.Enqueue(finished);
 
