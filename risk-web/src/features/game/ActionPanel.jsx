@@ -4,7 +4,7 @@ import Button from '../../components/Button.jsx'
 import { worldRegions } from '../map/worldRegions.js'
 import { clampAmount, findHuman, maxMovable, ownerSlot, panelMode, quickAmounts, stepAmount } from './gameActions.js'
 
-export default function ActionPanel({ game, selection, actionMode, onMode, onAction, busy, error, playback }) {
+export default function ActionPanel({ game, selection, actionMode, onMode, onAction, busy, error, playback, battleBoard }) {
   const mode = panelMode(game)
   const human = findHuman(game)
   const country = id => game.territories.find(t => t.countryId === id)
@@ -81,69 +81,70 @@ export default function ActionPanel({ game, selection, actionMode, onMode, onAct
     </span>
   </span>
 
+  const body = (left, right) => <div className="action-panel-body dock-body-group">
+    <div className="action-panel-info">{left}</div>
+    <div className="action-panel-details"><div className="action-panel-error" title={error}><Alert>{error}</Alert></div>{right}</div>
+  </div>
+  const endTurn = <Button variant="secondary" type="button" onClick={() => onAction('end')}>End turn</Button>
+  const actionContent = <>
+    <div className="action-panel-tabs">
+      <Button variant={actionMode === 'attack' ? 'primary' : 'secondary'} type="button" aria-pressed={actionMode === 'attack'} onClick={() => onMode('attack')}>Attack</Button>
+      <Button variant={actionMode === 'move' ? 'primary' : 'secondary'} type="button" aria-pressed={actionMode === 'move'} onClick={() => onMode('move')}>Move soldiers</Button>
+    </div>
+    {actionMode === 'attack' && game.attackedThisTurn
+      ? <p className="action-panel-notice" title="You have already attacked this turn"><span aria-hidden="true">!</span>You have already attacked this turn</p>
+      : <p className="action-panel-helper" title={actionMode === 'attack' ? 'Select your source country (2+ soldiers), then an enemy country.' : 'Select your source country, then another of your countries.'}>{actionMode === 'attack' ? 'Select your source country (2+ soldiers), then an enemy country.' : 'Select your source country, then another of your countries.'}</p>}
+    <div className="action-panel-selection">{chip('From', source)}<span aria-hidden="true">&rarr;</span>{chip('To', target)}</div>
+  </>
+
   return <section className="action-panel" aria-label="Turn controls" aria-busy={busy}>
-    <Alert>{error}</Alert>
-    {mode === 'npc' && <div className="npc-playback action-panel-mode">
-      <div className="action-panel-info">
-      <p title={`${current?.name} is playing...`}>{current?.name} is playing...</p>
-      {playback?.currentEvent?.justification && <p className="npc-playback-why">Why: {playback.currentEvent.justification}</p>}
-      </div>
-      <div className="action-panel-choices">
-      {playback?.playing && <Button variant="secondary" type="button" aria-pressed={playback.fastForward} onClick={playback.toggleSpeed}>Fast-forward: {playback.fastForward ? 'On' : 'Off'}</Button>}
-      {playback?.error && <Button variant="secondary" type="button" onClick={playback.retry}>Retry</Button>}
-      </div>
+    {mode === 'npc' && <div className="action-panel-shell action-panel-battle">
+      {body(battleBoard, <p className="action-panel-status" title={`${current?.name} is playing...`}>{current?.name} is playing...</p>)}
+      <footer className="action-panel-footer">
+        {playback?.playing && <Button variant="secondary" type="button" aria-pressed={playback.fastForward} onClick={playback.toggleSpeed}>Fast-forward: {playback.fastForward ? 'On' : 'Off'}</Button>}
+        {playback?.error && <Button variant="secondary" type="button" onClick={playback.retry}>Retry</Button>}
+      </footer>
     </div>}
     <fieldset disabled={busy}>
-      {mode === 'reinforce' && <form className="action-panel-mode" onSubmit={e => submit(e, 'reinforce', { countryId: selection.from, soldiers })}>
-        <div className="action-panel-info">
-        <h2>Place {human.pendingReinforcements} reinforcements</h2>
-        <p>Choose one of your countries on the map.</p>
-        <p className="action-panel-country" title={`Country: ${source?.name ?? 'None selected'}`}>Country: {source?.name ?? 'None selected'}</p>
-        </div>
-        <div className="action-panel-choices">
-        {amountInput}<Button className="action-panel-submit" disabled={!source || !validAmount}>Place</Button>
-        </div>
+      {mode === 'reinforce' && <form className="action-panel-shell" onSubmit={e => submit(e, 'reinforce', { countryId: selection.from, soldiers })}>
+        {body(<>
+          <h2 title={`Place ${human.pendingReinforcements} reinforcements`}>Place {human.pendingReinforcements} reinforcements</h2>
+          <p title="Choose one of your countries on the map.">Choose one of your countries on the map.</p>
+          <p className="action-panel-country" title={`Country: ${source?.name ?? 'None selected'}`}>Country: {source?.name ?? 'None selected'}</p>
+        </>, amountInput)}
+        <footer className="action-panel-footer"><Button className="action-panel-submit" disabled={!source || !validAmount}>Place</Button></footer>
       </form>}
-      {mode === 'action' && <div className="action-panel-mode">
-        <div className="action-panel-info">
-        <div className="action-panel-tabs">
-          <Button variant={actionMode === 'attack' ? 'primary' : 'secondary'} type="button" aria-pressed={actionMode === 'attack'} onClick={() => onMode('attack')}>Attack</Button>
-          <Button variant={actionMode === 'move' ? 'primary' : 'secondary'} type="button" aria-pressed={actionMode === 'move'} onClick={() => onMode('move')}>Move soldiers</Button>
+      {mode === 'action' && (actionMode === 'attack'
+        ? <div className="action-panel-shell">
+          {body(actionContent, null)}
+          <footer className="action-panel-footer">
+            <Button disabled={!source || !target || game.attackedThisTurn} onClick={() => onAction('attack', { fromCountryId: selection.from, toCountryId: selection.to })}>Attack</Button>
+            {endTurn}
+          </footer>
         </div>
-        <p className="action-panel-helper" title={actionMode === 'attack' ? 'Select your source country (2+ soldiers), then an enemy country.' : 'Select your source country, then another of your countries.'}>{actionMode === 'attack' ? 'Select your source country (2+ soldiers), then an enemy country.' : 'Select your source country, then another of your countries.'}</p>
-        <div className="action-panel-selection">{chip('From', source)}<span aria-hidden="true">→</span>{chip('To', target)}</div>
-        {actionMode === 'attack' && game.attackedThisTurn && <p className="action-panel-notice" title="You have already attacked this turn"><span aria-hidden="true">!</span>You have already attacked this turn</p>}
-        </div>
-        <div className="action-panel-choices">
-        <div className={`action-panel-actions ${actionMode === 'move' ? 'action-panel-actions-move' : ''}`}>
-        {actionMode === 'attack' ? <>
-          <Button disabled={!source || !target || game.attackedThisTurn} onClick={() => onAction('attack', { fromCountryId: selection.from, toCountryId: selection.to })}>Attack</Button>
-        </> : <form onSubmit={e => submit(e, 'transfer', { fromCountryId: selection.from, toCountryId: selection.to, soldiers })}>
-          {amountInput}<Button className="action-panel-submit" disabled={!source || !target || !validAmount}>Move</Button>
-        </form>}
-        <Button variant="secondary" type="button" onClick={() => onAction('end')}>End turn</Button>
-        </div>
-        </div>
+        : <form className="action-panel-shell" onSubmit={e => submit(e, 'transfer', { fromCountryId: selection.from, toCountryId: selection.to, soldiers })}>
+          {body(actionContent, amountInput)}
+          <footer className="action-panel-footer">
+            <Button className="action-panel-submit" disabled={!source || !target || !validAmount}>Move</Button>
+            {endTurn}
+          </footer>
+        </form>)}
+      {mode === 'attacking' && <div className="action-panel-shell action-panel-battle">
+        {body(battleBoard, <>
+          <h2 title={`${attacker?.name} is attacking ${defender?.name}`}>{attacker?.name} is attacking {defender?.name}</h2>
+          <p title="Stopping ends your turn."><small>Stopping ends your turn.</small></p>
+        </>)}
+        <footer className="action-panel-footer">
+          <Button onClick={() => onAction('roll')}>Roll</Button>
+          <Button variant="danger" onClick={() => onAction('stop')}>Stop attack</Button>
+        </footer>
       </div>}
-      {mode === 'attacking' && <div className="action-panel-mode">
-        <div className="action-panel-info">
-        <h2 title={`${attacker?.name} is attacking ${defender?.name}`}>{attacker?.name} is attacking {defender?.name}</h2>
-        <p><small>Stopping ends your turn.</small></p>
-        </div>
-        <div className="action-panel-choices">
-        <div className="action-panel-button-row">
-        <Button onClick={() => onAction('roll')}>Roll</Button>
-        <Button variant="danger" onClick={() => onAction('stop')}>Stop attack</Button>
-        </div>
-        </div>
-      </div>}
-      {mode === 'conquest' && <form className="action-panel-mode" onSubmit={e => submit(e, 'conquest', { soldiers })}>
-        <div className="action-panel-info">
-        <h2 title={`You conquered ${defender?.name}. Move soldiers in`}>You conquered {defender?.name}. Move soldiers in</h2>
-        </div>
-        <div className="action-panel-choices">
-        {amountInput}<Button className="action-panel-submit" disabled={!validAmount}>Move</Button>
-        </div>
+      {mode === 'conquest' && <form className="action-panel-shell action-panel-battle" onSubmit={e => submit(e, 'conquest', { soldiers })}>
+        {body(battleBoard, <>
+          <h2 title={`You conquered ${defender?.name}. Move soldiers in`}>You conquered {defender?.name}. Move soldiers in</h2>
+          {amountInput}
+        </>)}
+        <footer className="action-panel-footer"><Button className="action-panel-submit" disabled={!validAmount}>Move</Button></footer>
       </form>}
       {mode === 'finished' && <p role="status" className="action-panel-finished">{!game.winnerPlayerId ? 'You were eliminated. Game over.' : winner?.id === human.id ? 'You conquered the world!' : `${winner?.name} conquered the world`}</p>}
     </fieldset>

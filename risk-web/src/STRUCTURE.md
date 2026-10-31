@@ -38,6 +38,12 @@ src/
       ActionPanel.jsx
       EventLog.jsx
       GameOver.jsx
+      battle.js
+      battlePresentation.js
+      battle.test.js
+      BattleBoard.jsx
+      NpcDecisionCard.jsx
+      Die.jsx
       playbackSpeed.js
       playbackSpeed.test.js
       npcPlayback.js
@@ -46,6 +52,7 @@ src/
     map/
       WorldMap.jsx
       Arrows.jsx
+      AttackMarkers.jsx
       arrows.js
       arrows.test.js
       worldRegions.js
@@ -69,6 +76,10 @@ src/
       country-picker.css
       world-map.css
       map-arrows.css
+      attack-markers.css
+      battle-board.css
+      npc-decision-card.css
+      die.css
       game-menu.css
       game-setup.css
       action-panel.css
@@ -100,10 +111,9 @@ src/
 
 all CSS lives in src/css/.
 
-`features/game/GameOver.jsx` presents server final results and links to a fresh setup or headquarters; its styles are in `css/features/game-over.css`. The `new=1` headquarters query opens the existing setup dialog.
+Battle presentation: `features/game/battle.js` parses server dice and counts without applying game rules. `battlePresentation.js` retains visual attack context, the displayed round number and live count overrides; `battle.test.js` covers parsing, pairing and lifecycle resets. `BattleBoard.jsx` and `Die.jsx` render dice/results in the dock; `features/map/AttackMarkers.jsx` renders SVG badges, glows and brief event highlights inside the existing map area. Their styles live in `css/features/battle-board.css`, `die.css` and `attack-markers.css`. NPC callbacks clear live counts with each authoritative turn snapshot.
 
-NPC playback uses `useNpcPlayback.js` for cancellation, request ownership, errors and speed controls; `npcPlayback.js` sequences every server event before committing a turn. `playbackSpeed.js` defines both speeds and interruptible waits. Their Node tests cover event order, stopping, cancellation and speed changes. `map/arrows.js` maps server events to overlays and computes SVG geometry; `Arrows.jsx` renders those overlays using `css/features/map-arrows.css`. `arrows.test.js` covers event keys, geometry and retained attack arrows.
+`NpcDecisionCard.jsx` retains the latest replayed NPC decision until turn end and renders it in the top-right map overlay; its presentation is in `css/features/npc-decision-card.css`. `BattleBoard.jsx` occupies the dock's wider left controls column, with status text above the right-hand controls. Its scalable SVG sheet labels the two aligned dice rows ATK/DEF in a single horizontal strip without scrolling; narrow phone layouts show summaries without scrolling the controls. The last roll stays until a new attack or turn begins. These presentation changes leave map/dock dimensions and replay timing unchanged.
 
-Only `main.jsx` imports `css/index.css`. That stylesheet imports Tailwind first, followed by tokens, base, components, features, and pages. Shared dialog typography stays in `base.css` so feature overrides retain their existing precedence. No new tokens are introduced.
+The map card fits the `928 / 482` viewBox without vertical letterboxing, centred within `game-page-map-area`. The former decision-card top rail stays removed. The map takes the remaining height above a mode-independent compact dock: `--dock-height: clamp(256px, 27vh, 280px)` (phones retain a 420px stacked dock). The 256px minimum accommodates conquest transfer plus a one-line server error. Controls use fixed sizes without dock-height scaling, with their original action buttons pinned in a separate footer. The body stays vertically centred without internal scrolling. All action modes and final results share the `dock-body-group` layout: content blocks are centred horizontally and vertically, left-aligned internally, and separated by 36px when both are present. Empty board/status blocks do not reserve a column. A status-only block centres by itself; board appearance interpolates the group width and gap over 200ms, disabled for reduced motion. The board uses the existing dice-sheet width for its presentation width (at least 220px where space permits), anchors dice directly beside ATK/DEF labels, and keeps footer text inline. Status, selection and amount blocks share this placement before and after the first roll. Players remain compact and top-aligned. Reinforcement and action descriptions stay left of amount inputs; finished results and counts are also side by side. At high zoom only the page scrolls around the 240px minimum map row and fixed dock.
 
-Verification: `npm run lint`, `npm run build`, and `npm test`.

@@ -1,20 +1,23 @@
-.game-page { --dock-height: clamp(200px, 24vh, 240px); box-sizing: border-box; width: 100%; min-height: 100svh; margin: 0; padding: 12px 16px; }
+.game-page { --dock-height: clamp(256px, 27vh, 280px); box-sizing: border-box; position: relative; container-type: inline-size; width: 100%; height: 100vh; height: 100dvh; min-height: 0; margin: 0; padding: 12px 16px; display: grid; grid-template-rows: auto minmax(0, 1fr); overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable; }
 .game-page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #ffffff14; flex-shrink: 0; }
 .game-page-header h1 { margin: 0; color: #e0c38c; font: 28px Georgia, serif; }
 .game-page-back { display: inline-flex; align-items: center; gap: 8px; color: #c6ae7e; font-size: 13px; }
 .game-page-back:hover { color: #e0c38c; }
 .game-page-round { color: #94a09e; font-size: 12px; }
-.game-page-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-rows: minmax(0, 1fr) var(--dock-height); grid-template-areas: "map events" "dock events"; gap: 12px; margin-top: 12px; }
-.game-page-board { grid-area: map; min-width: 0; min-height: 0; display: grid; place-items: center; padding: 2px; border: 1px solid #52645b; background: #172325; }
-.game-page-board .world-map { width: 100%; height: 100%; min-height: 0; overflow: hidden; }
-.game-page-panel { box-sizing: border-box; grid-area: dock; height: var(--dock-height); min-height: var(--dock-height); max-height: var(--dock-height); min-width: 0; display: grid; grid-template-columns: 410px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 16px; padding: 10px; border: 1px solid #52645b; background: #172325; overflow: hidden; }
+.game-page-layout { min-width: 0; min-height: calc(240px + var(--dock-height) + 12px); display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-rows: minmax(240px, 1fr) var(--dock-height); grid-template-areas: "map events" "dock events"; gap: 12px; margin-top: 12px; }
+/* The map takes the remaining height; the dock stays independent of mode content. */
+.game-page-map-area { grid-area: map; min-width: 0; min-height: 0; display: grid; place-items: center; position: relative; container-type: size; overflow: hidden; }
+.game-page-board { box-sizing: content-box; min-width: 0; min-height: 0; width: auto; height: min(calc(100cqh - 2px), calc((100cqw - 2px) * 482 / 928)); max-width: calc(100cqw - 2px); aspect-ratio: 928 / 482; padding: 0; border: 1px solid #52645b; background: #172325; }
+.game-page-board .world-map { display: block; width: 100%; height: 100%; min-height: 0; padding: 0; overflow: hidden; }
+.game-page-panel { box-sizing: border-box; grid-area: dock; container-type: size; container-name: game-dock; height: var(--dock-height); min-height: var(--dock-height); max-height: var(--dock-height); min-width: 0; display: grid; grid-template-columns: 410px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 16px; padding: 10px; border: 1px solid #52645b; background: #172325; overflow: hidden; }
 .game-page-dock-players, .game-page-dock-controls { min-width: 0; }
 .game-page-dock-players { box-sizing: border-box; width: 410px; min-width: 410px; max-width: 410px; align-self: start; }
-.game-page-dock-controls { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; border-left: 1px solid #52645b; padding-left: 16px; }
+.game-page-dock-controls { display: flex; flex-direction: column; gap: 6px; min-height: 0; overflow: hidden; border-left: 1px solid #52645b; padding-left: 12px; }
 .game-page-control-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-shrink: 0; min-width: 0; }
 .game-page-control-heading .eyebrow { flex-shrink: 0; margin: 0; }
-.game-page-control-heading .game-page-turn { min-width: 0; margin: 0; font-size: 16px; line-height: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.game-page-panel > .game-over { grid-column: 1 / -1; min-height: 0; overflow: auto; }
+.game-page-control-heading .game-page-turn { display: block; min-width: 0; margin: 0; font-size: 14px; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.game-page-control-heading .game-page-owner-dot { display: inline-block; vertical-align: middle; margin-right: 6px; }
+.game-page-panel > .game-over { grid-column: 1 / -1; min-height: 0; overflow: hidden; }
 .game-page-dock-controls .action-panel { margin-bottom: 0; }
 .game-page-panel .eyebrow { margin: 0 0 6px; font-size: 10px; font-weight: 600; letter-spacing: 1.8px; color: #94a09e; }
 .game-page-turn { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 18px; color: #e0c38c; overflow-wrap: anywhere; }
@@ -35,20 +38,17 @@
 .game-page-badge-eliminated { color: #94a09e; border-color: #52645b; }
 .game-page-message { max-width: 520px; margin: 15svh auto; padding: 28px; border: 1px solid #52645b; background: #172325; color: #c6cdbe; text-align: center; }
 .game-page-message a { display: inline-block; color: #e0c38c; margin-top: 12px; }
-@media (min-width: 1100px) { .game-page { height: 100vh; height: 100dvh; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; } }
 @media (max-width: 1099px) {
-  .game-page { --dock-height: 340px; }
-  .game-page-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto var(--dock-height) 320px; grid-template-areas: "map" "dock" "events"; height: auto; }
-  .game-page-board .world-map { height: auto; max-height: none; }
-  .game-page-panel { grid-template-columns: minmax(0, 1fr); grid-template-rows: 153px minmax(0, 1fr); gap: 8px; }
-  .game-page-panel > .game-over { grid-row: 1 / -1; }
-  .game-page-dock-players { width: 100%; min-width: 0; max-width: none; }
-  .game-page-dock-controls { padding: 8px 0 0; border-left: 0; border-top: 1px solid #52645b; }
+  .game-page-layout { min-height: calc(240px + var(--dock-height) + 344px); grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(240px, 1fr) var(--dock-height) 320px; grid-template-areas: "map" "dock" "events"; }
+  .game-page-panel { grid-template-columns: 260px minmax(0, 1fr); gap: 10px; }
+  .game-page-dock-players { width: 260px; min-width: 260px; max-width: 260px; min-height: 0; max-height: 100%; }
 }
 @media (max-width: 759px) {
-  .game-page { --dock-height: 560px; padding: 16px; }
-  .game-page-panel { grid-template-rows: 283px minmax(0, 1fr); }
+  .game-page { --dock-height: 420px; padding: 12px; }
+  .game-page-panel { grid-template-columns: minmax(0, 1fr); grid-template-rows: 153px minmax(0, 1fr); gap: 6px; }
+  .game-page-panel > .game-over { grid-row: 1 / -1; }
+  .game-page-dock-players { width: 100%; min-width: 0; max-width: none; height: 153px; max-height: 153px; }
+  .game-page-dock-controls { padding: 6px 0 0; border-left: 0; border-top: 1px solid #52645b; }
   .game-page-header { gap: 14px; }
   .game-page-header h1 { font-size: 24px; }
-  .game-page-players { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
 }

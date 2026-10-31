@@ -4,13 +4,14 @@ import { isNpcTurn } from './gameActions.js'
 import { playbackPause } from './playbackSpeed.js'
 import { replayNpcTurns } from './npcPlayback.js'
 
-export default function useNpcPlayback({ game, gameId, busy, setGame, setEvents }) {
+export default function useNpcPlayback({ game, gameId, busy, setGame, setEvents, onBattleEvent, onBattleTurn }) {
   const [playing, setPlaying] = useState(false)
   const [fastForward, setFastForward] = useState(false)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
   const [currentEvent, setCurrentEvent] = useState(null)
   const [arrow, setArrow] = useState(null)
+  const [decision, setDecision] = useState(null)
   const speed = useRef(false)
   const latest = useRef(game)
   const token = useRef(null)
@@ -39,16 +40,19 @@ export default function useNpcPlayback({ game, gameId, busy, setGame, setEvents 
           pause: kind => playbackPause(kind, () => speed.current, controller.signal),
           isActive: active,
           onEvent: (event, displayed) => {
+            if (event.type === 'NpcDecision') setDecision({ event, ended: false })
+            onBattleEvent?.(event, speed.current)
             setArrow(displayed)
             setCurrentEvent(event)
             setEvents(previous => [...previous.filter(item => item.sequence !== event.sequence), event])
           },
-          onTurn: nextGame => { setArrow(null); setCurrentEvent(null); setGame(nextGame) },
+          onTurn: nextGame => { setDecision(previous => previous ? { ...previous, ended: true } : null); onBattleTurn?.(); setArrow(null); setCurrentEvent(null); setGame(nextGame) },
         })
       } catch (err) {
         if (active()) setError(err.message)
       } finally {
         if (active()) {
+          setDecision(previous => previous ? { ...previous, ended: true } : null)
           setPlaying(false)
           setCurrentEvent(null)
           setArrow(null)
@@ -59,9 +63,9 @@ export default function useNpcPlayback({ game, gameId, busy, setGame, setEvents 
     }
     run()
     return () => { cancelled = true; controller.abort(); token.current = null }
-  }, [enabled, gameId, retry, setGame, setEvents])
+  }, [enabled, gameId, retry, setGame, setEvents, onBattleEvent, onBattleTurn])
 
-  return { playing: enabled && playing, fastForward: enabled && fastForward, error: enabled ? error : '', currentEvent: enabled ? currentEvent : null, arrow: enabled ? arrow : null,
+  return { playing: enabled && playing, fastForward: enabled && fastForward, error: enabled ? error : '', currentEvent: enabled ? currentEvent : null, arrow: enabled ? arrow : null, decision,
     toggleSpeed: () => { speed.current = !speed.current; setFastForward(speed.current) },
     retry: () => setRetry(value => value + 1),
   }
