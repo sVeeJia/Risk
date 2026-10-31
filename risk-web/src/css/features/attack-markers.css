@@ -1,0 +1,23 @@
+.attack-markers { --hit-duration: 700ms; --conquer-duration: 1200ms; pointer-events: none; }
+.attack-markers.battle-visuals-fast { --hit-duration: 150ms; --conquer-duration: 300ms; }
+.attack-attacker { --battle-colour: #ef815d; }
+.attack-defender { --battle-colour: #69c3d0; }
+.attack-glow { fill: none; stroke: var(--battle-colour); stroke-width: 5px; stroke-linejoin: round; filter: drop-shadow(0 0 6px var(--battle-colour)); animation: attack-pulse 1400ms ease-in-out infinite alternate; }
+.battle-visuals-fast .attack-glow { animation-duration: 280ms; }
+.attack-badge > circle { fill: #10191ce8; stroke: var(--battle-colour); stroke-width: 1.5px; }
+.attack-badge svg { fill: none; stroke: var(--battle-colour); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.attack-hit-shape, .attack-conquered-flash { stroke-width: 4; stroke: #ef815d; fill: #ef815d40; animation: battle-flash var(--hit-duration) ease-out forwards; }
+.attack-hit-safe { fill: #e0c38c35; stroke: #e0c38c; }
+.attack-loss-label { text-anchor: middle; fill: #ff9a81; font: bold 22px Arial, sans-serif; paint-order: stroke; stroke: #10191c; stroke-width: 4px; animation: battle-loss-float var(--hit-duration) ease-out forwards; }
+.attack-conquered { animation: battle-flash var(--conquer-duration) ease-out forwards; }
+.attack-conquered rect { fill: #10191cf0; stroke: #e0c38c; }
+.attack-conquered text { fill: #e0c38c; font: bold 13px Arial, sans-serif; }
+.attack-conquered-flash { stroke: #e0c38c; fill: #e0c38c55; animation-duration: var(--conquer-duration); }
+@keyframes attack-pulse { from { opacity: .6; } to { opacity: 1; } }
+@keyframes battle-flash { 0%, 40% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes battle-loss-float { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-28px); } }
+@media (prefers-reduced-motion: reduce) {
+  .attack-glow { animation: none; }
+  .attack-loss-label { animation: battle-flash var(--hit-duration) steps(1, end) forwards; }
+  .attack-hit-shape, .attack-conquered, .attack-conquered-flash { animation-timing-function: steps(1, end); }
+}

@@ -9,6 +9,10 @@
 @import "./features/country-picker.css";
 @import "./features/world-map.css";
 @import "./features/map-arrows.css";
+@import "./features/attack-markers.css";
+@import "./features/battle-board.css";
+@import "./features/npc-decision-card.css";
+@import "./features/die.css";
 @import "./features/game-menu.css";
 @import "./features/game-setup.css";
 @import "./features/action-panel.css";

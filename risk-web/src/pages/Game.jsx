@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Swords } from 'lucide-react'
 import * as games from '../api/games.js'
@@ -12,6 +12,10 @@ import { worldRegions } from '../features/map/worldRegions.js'
 import WorldMap from '../features/map/WorldMap.jsx'
 import useNpcPlayback from '../features/game/useNpcPlayback.js'
 import { arrowForEvent, arrowFromGame } from '../features/map/arrows.js'
+import { markersFromAttack } from '../features/game/battle.js'
+import { battlePresentation, emptyBattle } from '../features/game/battlePresentation.js'
+import BattleBoard from '../features/game/BattleBoard.jsx'
+import NpcDecisionCard from '../features/game/NpcDecisionCard.jsx'
 
 const actions = {
   attack: games.attack, roll: games.rollAttack, stop: games.stopAttack,
@@ -37,7 +41,10 @@ function GameScreen({ gameId }) {
   const request = useRef(null)
   const [moveArrow, setMoveArrow] = useState(null)
   const [historyReady, setHistoryReady] = useState(false)
-  const playback = useNpcPlayback({ game, gameId, busy: busy || !historyReady || Boolean(moveArrow), setGame, setEvents })
+  const [battle, dispatchBattle] = useReducer(battlePresentation, emptyBattle)
+  const onBattleEvent = useCallback((event, fastForward) => dispatchBattle({ type: 'event', event, live: true, fastForward }), [])
+  const onBattleTurn = useCallback(() => dispatchBattle({ type: 'turnEnd' }), [])
+  const playback = useNpcPlayback({ game, gameId, busy: busy || !historyReady || Boolean(moveArrow), setGame, setEvents, onBattleEvent, onBattleTurn })
   const locked = busy || Boolean(game && ['npc', 'finished'].includes(panelMode(game)))
   useEffect(() => {
     if (!moveArrow) return
@@ -58,6 +65,7 @@ function GameScreen({ gameId }) {
     games.getGame(gameId, { signal: controller.signal }).then(data => {
       if (controller.signal.aborted) return
       setGame(data)
+      dispatchBattle({ type: 'load', game: data })
     }).catch(err => {
       if (!controller.signal.aborted) setError(err.status === 404 ? 'This game was not found.' : err.message)
     }).finally(() => {
@@ -78,6 +86,7 @@ function GameScreen({ gameId }) {
       if (controller.signal.aborted) return
       setGame(response.game)
       setEvents(previous => [...previous, ...response.events])
+      for (const event of response.events) dispatchBattle({ type: 'event', event })
       setSelection(emptySelection)
       const move = response.events.map(arrowForEvent).find(arrow => arrow?.kind === 'move')
       setMoveArrow(move ? { ...move, transient: true, sequence: response.events.at(-1)?.sequence } : null)
@@ -100,6 +109,8 @@ function GameScreen({ gameId }) {
   const preview = mode === 'action' && actionMode === 'attack' && selection.from && selection.to
     ? { kind: 'attack', from: selection.from, to: selection.to, preview: true } : null
   const arrow = mode === 'finished' ? null : moveArrow ?? (mode === 'npc' ? playback.arrow : arrowFromGame(game) ?? preview)
+  const markers = markersFromAttack(mode === 'npc' ? battle.attack : game.activeAttack)
+  const battleFast = playback.playing ? playback.fastForward : battle.board?.fastForward ?? false
   function select(countryId) {
     if (locked) return
     const territory = game.territories.find(t => t.countryId === countryId)
@@ -122,8 +133,11 @@ function GameScreen({ gameId }) {
       <span className="game-page-round">Round {game.round} · {game.phase} phase</span>
     </header>
     <div className="game-page-layout">
-      <section className="game-page-board" aria-label="Game board">
-        <WorldMap countryAssignments={assignments} showSoldiers onSelect={select} selectedFrom={selection.from} selectedTo={selection.to} territories={game.territories} players={game.players} disabled={locked} arrow={arrow} reinforcement={playback.currentEvent?.type === 'ReinforcementsPlaced' ? playback.currentEvent : null} />
+      <section className="game-page-map-area" aria-label="Game board">
+        <div className="game-page-board">
+        <WorldMap countryAssignments={assignments} showSoldiers onSelect={select} selectedFrom={selection.from} selectedTo={selection.to} territories={game.territories} players={game.players} disabled={locked} arrow={arrow} reinforcement={playback.currentEvent?.type === 'ReinforcementsPlaced' ? playback.currentEvent : null} markers={markers} battleHit={battle.hit} conquered={battle.conquered} fastForward={battleFast} liveCounts={battle.liveCounts} />
+        </div>
+        <NpcDecisionCard key={playback.decision?.event.sequence ?? 'no-decision'} decision={playback.decision} game={game} />
       </section>
       <aside className="game-page-panel" aria-label="Game status">
         {mode === 'finished' ? <GameOver game={game} /> : <>
@@ -151,7 +165,7 @@ function GameScreen({ gameId }) {
           {current?.isHuman ? 'Your turn' : `${current?.name ?? 'Unknown'} to play`}
         </p>
         </div>
-        <ActionPanel key={`${mode}:${actionMode}:${game.round}:${game.activeAttack?.attackerCountryId}`} game={game} selection={selection} actionMode={actionMode} busy={locked} error={playback.error || error} playback={playback} onAction={perform} onMode={value => { setActionMode(value); setSelection(emptySelection) }} />
+        <ActionPanel key={`${mode}:${actionMode}:${game.round}:${game.activeAttack?.attackerCountryId}`} game={game} selection={selection} actionMode={actionMode} busy={locked} error={playback.error || error} playback={playback} onAction={perform} onMode={value => { setActionMode(value); setSelection(emptySelection) }} battleBoard={<BattleBoard board={battle.board} territories={game.territories} players={game.players} fastForward={battleFast} />} />
         </section>
         </>}
       </aside>
