@@ -1,9 +1,11 @@
 using Risk.Api.DataStructures;
 using Risk.Api.DesignPatterns.Command;
 using Risk.Api.DesignPatterns.Command.Interfaces;
+using Risk.Api.DesignPatterns.Observer.Interfaces;
 using Risk.Api.DesignPatterns.Repository.Interfaces;
-using Risk.Api.Services.Interfaces;
 using Risk.Api.DesignPatterns.Strategy.Interfaces;
+using Risk.Api.Models;
+using Risk.Api.Services.Interfaces;
 
 namespace Risk.Api.Services;
 
@@ -12,12 +14,18 @@ public sealed class GameplayService : IGameplayService
     private readonly IGameRepository _games;
     private readonly IGameEventRepository _events;
     private readonly INpcStrategy _npcStrategy;
+    private readonly IReadOnlyList<IGameObserver> _observers;
 
-    public GameplayService(IGameRepository games, IGameEventRepository events, INpcStrategy npcStrategy)
+    public GameplayService(
+        IGameRepository games,
+        IGameEventRepository events,
+        INpcStrategy npcStrategy,
+        IEnumerable<IGameObserver>? observers = null)
     {
         _games = games;
         _events = events;
         _npcStrategy = npcStrategy;
+        _observers = observers?.ToList() ?? new List<IGameObserver>();
     }
 
     public Task<GameplayResult> StartAttackAsync(string userId, string gameId, string fromCountryId, string toCountryId, CancellationToken ct = default) =>
@@ -68,8 +76,29 @@ public sealed class GameplayService : IGameplayService
         {
             return GameplayResult.Conflict();
         }
-            
+
         await _events.AppendAsync(log.Events, ct);
+
+        // Tell everyone who is watching, but only once the change is safely stored.
+        await NotifyObserversAsync(game, log.Events);
+
         return GameplayResult.Success(game, log.Events);
+    }
+
+    private async Task NotifyObserversAsync(Game game, IReadOnlyList<GameEvent> events)
+    {
+        foreach (var observer in _observers)
+        {
+            try
+            {
+                // CancellationToken.None: the change is already saved, so spectators are told even if the player's request was cancelled.
+                await observer.OnGameChangedAsync(game, events, CancellationToken.None);
+            }
+            catch (Exception)
+            {
+                // A failing observer (for example a dropped live connection) must never fail the player's action.
+                // Observers log their own errors.
+            }
+        }
     }
 }
