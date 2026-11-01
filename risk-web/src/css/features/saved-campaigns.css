@@ -1,0 +1,10 @@
+.briefing:has(.saved-campaigns) { box-sizing: border-box; width: min(680px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; }
+.saved-campaigns ul { list-style: none; margin: 0; padding: 0; }
+.saved-campaign-row { display: flex; align-items: center; gap: 12px; margin: 0; padding: 12px 4px; border-top: 1px solid #ffffff20; border-radius: 4px; cursor: pointer; }
+.saved-campaign-row:hover, .saved-campaign-row:focus-visible { background: #c6ae7e12; }
+.saved-campaign-row:focus-visible { outline: 2px solid #e4bd6b; outline-offset: 2px; }
+.saved-campaign-text { display: flex; flex: 1; flex-direction: column; min-width: 0; gap: 3px; color: #c6cdbe; }
+.saved-campaign-text time { font-weight: 600; color: #e0c38c; }
+.saved-campaign-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.saved-campaign-resume { flex-shrink: 0; min-width: 90px; }
+@media (max-width: 480px) { .saved-campaign-row { align-items: stretch; flex-direction: column; gap: 8px; } .saved-campaign-resume { align-self: flex-start; } }

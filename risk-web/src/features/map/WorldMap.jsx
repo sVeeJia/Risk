@@ -4,10 +4,10 @@ import Arrows from './Arrows.jsx'
 import { ownerSlot } from '../game/gameActions.js'
 import AttackMarkers from './AttackMarkers.jsx'
 
-export default function WorldMap({ selectedIds, startId, countryAssignments = [], showSoldiers = false, onSelect, selectedFrom, selectedTo, territories = [], players = [], disabled = false, arrow, reinforcement, markers, battleHit, conquered, fastForward = false, liveCounts = {} }) {
+export default function WorldMap({ selectedIds, startId, countryAssignments = [], showSoldiers = false, onSelect, selectedFrom, selectedTo, territories = [], players = [], disabled = false, fitted = false, arrow, reinforcement, markers, battleHit, conquered, fastForward = false, liveCounts = {} }) {
     const gridId = useId()
   
-  return <svg className="world-map fictional-map" viewBox={onSelect ? '20 4 928 482' : '0 0 960 500'} preserveAspectRatio="xMidYMid meet" role={onSelect ? 'group' : 'img'} aria-label="Fictional world of ten irregular territories: three central territories and seven surrounding islands, linked by dotted sea routes">
+  return <svg className="world-map fictional-map" viewBox={onSelect || fitted ? '20 4 928 482' : '0 0 960 500'} preserveAspectRatio="xMidYMid meet" role={onSelect ? 'group' : 'img'} aria-label="Fictional world of ten irregular territories: three central territories and seven surrounding islands, linked by dotted sea routes">
     <defs><pattern id={gridId} width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#779a9e" strokeOpacity=".08" /></pattern></defs>
     <rect width="960" height="500" fill={`url(#${gridId})`} />
     <ellipse cx="480" cy="250" rx="440" ry="225" className="map-orbit" />

@@ -14,10 +14,12 @@
 @import "./features/npc-decision-card.css";
 @import "./features/die.css";
 @import "./features/game-menu.css";
+@import "./features/saved-campaigns.css";
 @import "./features/game-setup.css";
 @import "./features/action-panel.css";
 @import "./features/game-over.css";
 @import "./features/event-log.css";
+@import "./features/spectator.css";
 @import "./pages/landing.css";
 @import "./pages/lobby.css";
 @import "./pages/login.css";
