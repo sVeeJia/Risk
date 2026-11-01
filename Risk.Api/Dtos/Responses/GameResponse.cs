@@ -29,4 +29,5 @@ public sealed record GameResponse(
     IReadOnlyList<PlayerResponse> Players,
     DateTime CreatedAt,
     AttackResponse? ActiveAttack,
-    bool AttackedThisTurn);
+    bool AttackedThisTurn,
+    long Version);

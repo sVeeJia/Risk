@@ -46,7 +46,8 @@ public static class GameMapper
             game.ActiveAttack is null
                 ? null
                 : new AttackResponse(game.ActiveAttack.AttackerCountryId, game.ActiveAttack.DefenderCountryId),
-            game.AttackedThisTurn);
+            game.AttackedThisTurn,
+            game.Version);
     }
 
     public static GameSummaryResponse ToSummary(Game game)

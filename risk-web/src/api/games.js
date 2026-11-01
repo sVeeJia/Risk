@@ -5,7 +5,7 @@ export const startGame = (startingCountryId, options) => api.post('/api/games', 
 
 export const getGame = (id, options) => api.get(`/api/games/${encodeURIComponent(id)}`, options)
 
-export const listGames = () => api.get('/api/games')
+export const listGames = options => api.get('/api/games', options)
 
 const gamePath = id => `/api/games/${encodeURIComponent(id)}`
 export const attack = (id, body, options) => api.post(`${gamePath(id)}/attack`, body, options)

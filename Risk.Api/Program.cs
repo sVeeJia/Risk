@@ -138,6 +138,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<GameHub>("/hubs/game");
 
 // check to see if mongo is connected
 app.MapGet("/health/db", async (IMongoClient client) =>

@@ -11,6 +11,7 @@ function initialBoard(game) {
 
 // Presentation state only. Never changes game state or derives soldier totals.
 export function battlePresentation(state, action) {
+  if (action.type === 'snapshot') return { ...state, attack: action.game.activeAttack, liveCounts: {} }
   if (action.type === 'load') return { ...emptyBattle, attack: action.game.activeAttack, board: initialBoard(action.game) }
   if (action.type === 'turnEnd') return { ...state, attack: null, liveCounts: {}, hit: null, conquered: null,
     board: state.board ? { ...state.board, ended: true, visible: false } : null }

@@ -9,6 +9,8 @@ src/
     countries.js
     games.js
     games.test.js
+    spectate.js
+    spectate.test.js
   auth/
     authContext.js
     AuthProvider.jsx
@@ -30,6 +32,10 @@ src/
       filterCountries.test.js
     game/
       GameMenu.jsx
+      HomeLayout.jsx
+      SavedCampaigns.jsx
+      savedCampaigns.js
+      savedCampaigns.test.js
       GameSetup.jsx
       boardAssignments.js
       boardAssignments.test.js
@@ -49,6 +55,14 @@ src/
       npcPlayback.js
       npcPlayback.test.js
       useNpcPlayback.js
+      GameLayout.jsx
+      ShareLink.jsx
+      SpectatorStatus.jsx
+      spectatorEvents.js
+      spectatorQueue.js
+      spectatorSession.js
+      spectator.test.js
+      useSpectator.js
     map/
       WorldMap.jsx
       Arrows.jsx
@@ -60,6 +74,7 @@ src/
     Landing.jsx
     Lobby.jsx
     Game.jsx
+    Watch.jsx
     Login.jsx
     Register.jsx
   css/
@@ -81,10 +96,12 @@ src/
       npc-decision-card.css
       die.css
       game-menu.css
+      saved-campaigns.css
       game-setup.css
       action-panel.css
       game-over.css
       event-log.css
+      spectator.css
     pages/
       landing.css
       lobby.css
@@ -94,7 +111,7 @@ src/
 ```
 
 - `main.jsx` initializes React, routing, authentication, and the sole stylesheet import; `App.jsx` defines routes.
-- `api/` contains HTTP operations; every request goes through `client.js` and the existing `/api` proxy.
+- `api/` contains HTTP operations through the existing `/api` proxy. Owner requests use `client.js`; public spectator GETs explicitly omit credentials in `spectate.js`.
 - `auth/` contains the authentication context, provider, and hook.
 - `routes/` contains route guards; `guards.jsx` re-exports their default components as the existing named interface.
 - `components/` contains reusable presentation components.
@@ -117,3 +134,13 @@ Battle presentation: `features/game/battle.js` parses server dice and counts wit
 
 The map card fits the `928 / 482` viewBox without vertical letterboxing, centred within `game-page-map-area`. The former decision-card top rail stays removed. The map takes the remaining height above a mode-independent compact dock: `--dock-height: clamp(256px, 27vh, 280px)` (phones retain a 420px stacked dock). The 256px minimum accommodates conquest transfer plus a one-line server error. Controls use fixed sizes without dock-height scaling, with their original action buttons pinned in a separate footer. The body stays vertically centred without internal scrolling. All action modes and final results share the `dock-body-group` layout: content blocks are centred horizontally and vertically, left-aligned internally, and separated by 36px when both are present. Empty board/status blocks do not reserve a column. A status-only block centres by itself; board appearance interpolates the group width and gap over 200ms, disabled for reduced motion. The board uses the existing dice-sheet width for its presentation width (at least 220px where space permits), anchors dice directly beside ATK/DEF labels, and keeps footer text inline. Status, selection and amount blocks share this placement before and after the first roll. Players remain compact and top-aligned. Reinforcement and action descriptions stay left of amount inputs; finished results and counts are also side by side. At high zoom only the page scrolls around the 240px minimum map row and fixed dock.
 
+
+Public live viewing: `pages/Watch.jsx` serves `/watch/:gameId` without the login guard. `api/spectate.js` uses credential-free public GETs and the SignalR client (`@microsoft/signalr`) at `/hubs/game`. `spectate.test.js` checks URLs, cookie omission, cancellation and 404s. `GameLayout.jsx` shares the existing map, compact players list, overlays, dock and log with the owner's Game page. `SpectatorStatus.jsx` replaces action controls with read-only status and playback controls; `GameOver.jsx` omits restart actions in read-only mode. `ShareLink.jsx` uses `spectatorEvents.js` to build the public URL, with clipboard confirmation and a selectable fallback. Owner routes support both `/play/:gameId` and `/game/:gameId`.
+
+`spectatorEvents.js` merges event sequences, pages bare history arrays and rejects stale/unversioned snapshots. `spectatorSession.js` buffers the subscription/reconnection gap, rejoins the group and refetches missed events and the public snapshot. `spectatorQueue.js` serializes all action batches using the same `replayEvents` and `playbackPause` as NPC playback. `useSpectator.js` owns the cancellable connection lifetime, speed, battle presentation and live counts. `spectator.test.js` covers queue order, duplicates, paging, versions, catch-up races and cleanup. Styling is in `css/features/spectator.css`; dock dimensions are inherited unchanged. The local npm download cache is ignored in `risk-web/.gitignore`.
+
+Browser verification uses the built frontend and the real SignalR client against an ephemeral mock HTTP/WebSocket hub, without starting or inspecting the backend. It covers anonymous history paging, live and buffered updates, fast-forward, battle visuals, refresh, owner read-only viewing, share fallback, game-over and 404 UI, including a zoom-equivalent narrow viewport.
+
+Home screens: `HomeLayout.jsx` renders the shared header, hero, map preview and fixed two-slot action area. `GameMenu.jsx` supplies auth-specific header/actions and owns its existing briefing/setup dialog. Both auth states have two actions; the single-player menu has no friends/private-game entry. The former principles strip, footer, map legend and sea-route note and their styles/data have been removed. Both home pages use `css/features/game-menu.css`.
+
+`SavedCampaigns.jsx` opens inside the existing dialog and uses `listGames` (`GET /api/games`), with cancellation, loading/empty/error/retry states. `savedCampaigns.js` sorts newest first, formats only server-provided round/player/result/country counts and optionally hydrates summary entries using the existing game GET. Its Node tests cover these displays, sorting, empty states and failed loading. Rows and their gold Resume/Review actions navigate only to `/play/:gameId`, matching game setup. Rows support focus and Enter/Space activation; narrow layouts put the action below the text. Human turns read "Your turn" and country labels use singular/plural correctly. Sharing is available only on the game page, not in this list. Panel styles live in `css/features/saved-campaigns.css`. The spectator Home link explicitly points to `/play` for authenticated users and `/` for guests.
