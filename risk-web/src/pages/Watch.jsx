@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import Button from '../components/Button.jsx'
 import GameLayout from '../features/game/GameLayout.jsx'
 import BattleBoard from '../features/game/BattleBoard.jsx'
@@ -16,6 +16,7 @@ export default function Watch() {
 function WatchScreen({ gameId }) {
   const playback = useSpectator(gameId)
   const { game, events, battle, notFound, error } = playback
+  if (game?.phase === 'Finished') return <Navigate to={`/replay/${encodeURIComponent(game.id)}`} replace />
   if (notFound || !game) return <main className="game-page"><div className="game-page-message">
     <p role={error ? 'alert' : 'status'}>{notFound ? 'Game not found' : error || 'Loading game…'}</p>
     <Button as={Link} variant="secondary" to="/">Home</Button>

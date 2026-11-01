@@ -22,7 +22,7 @@ export async function spectateSession({ id, signal, getGame, getEvents, createCo
     const [game, history] = await Promise.all([getGame(id, { signal }), loadHistory(page)])
     newerGame(null, game)
     if (!active()) return
-    onInitial(game, history)
+    if (onInitial(game, history) === false) return
     const queue = createQueue(game, mergeEvents(history).lastSeenSequence)
     connection = createConnection()
     signal.addEventListener('abort', stop, { once: true })

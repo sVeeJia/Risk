@@ -2,7 +2,7 @@ import Die from './Die.jsx'
 import { ownerSlot } from './gameActions.js'
 import { worldRegions } from '../map/worldRegions.js'
 
-export default function BattleBoard({ board, territories, players = [], fastForward = false, commentary = null }) {
+export default function BattleBoard({ board, territories, players = [], fastForward = false, commentary = null, animate = true }) {
   const ended = Boolean(board?.ended)
   if (!board?.result || board.visible === false) return null
   const name = id => territories.find(country => country.countryId === id)?.name ?? id
@@ -15,7 +15,7 @@ export default function BattleBoard({ board, territories, players = [], fastForw
   const { result } = board
   const diceWidth = result.pairs.length * (result.pairs.length > 6 ? 34 : 48)
   const diceHeight = result.pairs.length > 6 ? 74 : 98
-  return <aside className={`battle-board ${fastForward ? 'battle-visuals-fast' : ''} ${ended ? 'battle-board-ended' : ''}`} style={{ '--battle-dice-width': `${diceWidth}px` }} aria-label="Battle board">
+  return <aside className={`battle-board ${fastForward ? 'battle-visuals-fast' : ''} ${ended ? 'battle-board-ended' : ''} ${animate ? '' : 'battle-board-static'}`} style={{ '--battle-dice-width': `${diceWidth}px` }} aria-label="Battle board">
     <header><strong title={`${attacker} vs ${defender}`}>
       <svg className="battle-country-dot" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill={colour(board.attackerId)} /></svg>
       <span className="battle-country-name">{attacker}</span>{' vs '}

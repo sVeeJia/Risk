@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { campaignListState, campaignRow, loadSavedCampaigns, newestCampaigns } from './savedCampaigns.js'
+import { campaignEmptyMessage, campaignListState, campaignRow, campaignsForMode, loadSavedCampaigns, newestCampaigns } from './savedCampaigns.js'
 
 const campaign = overrides => ({ id: 'old', createdAt: '2026-01-15T12:00:00Z', round: 4, phase: 'Action', currentPlayerId: 'npc',
   players: [{ id: 'human', name: 'Alice', isHuman: true, countriesOwned: 3 }, { id: 'npc', name: 'China', isHuman: false }], ...overrides })
@@ -23,10 +23,12 @@ test('row formatting shows the server round, current player and human countries 
 })
 
 test('finished rows show known Won/Lost results without showing a current turn', () => {
-  assert.equal(campaignRow(campaign({ phase: 'Finished', winnerPlayerId: 'human' })).turn, 'Finished · Won')
-  assert.equal(campaignRow(campaign({ phase: 'Finished', winnerPlayerId: 'npc' })).turn, 'Finished · Lost')
-  assert.equal(campaignRow(campaign({ phase: 'Finished', winnerPlayerId: null, players: [{ id: 'human', isHuman: true, countriesOwned: 0, isEliminated: true }] })).turn, 'Finished · Lost')
-  assert.equal(campaignRow(campaign({ phase: 'Finished', winnerPlayerId: null })).turn, 'Finished')
+  assert.equal(campaignRow(campaign({ phase: 'Finished', winnerPlayerId: 'human' })).turn, 'Won')
+  assert.equal(campaignRow(campaign({ phase: 'Finished', winnerPlayerId: 'npc' })).turn, 'Lost')
+  assert.equal(campaignRow(campaign({ phase: 'Finished', winnerPlayerId: null, players: [{ id: 'human', isHuman: true, countriesOwned: 0, isEliminated: true }] })).turn, 'Lost')
+  assert.equal(campaignRow(campaign({ phase: 'Finished', winnerPlayerId: null })).turn, 'Lost')
+  assert.equal(campaignRow(campaign({ phase: 'Finished', round: 1, winnerPlayerId: 'human' })).summary, '1 round played · Won')
+  assert.equal(campaignRow(campaign({ phase: 'Finished', round: 4, winnerPlayerId: 'npc' })).summary, '4 rounds played · Lost')
 })
 
 test('missing display fields are explicit instead of invented', () => {
@@ -37,12 +39,33 @@ test('missing display fields are explicit instead of invented', () => {
   assert.equal(row.countryLabel, 'Countries unavailable')
 })
 
-test('Resume and Review always use the owner route, never the watch route', () => {
+test('Resume opens the owner route and Watch replay opens the public replay route', () => {
   for (const phase of ['Reinforcing', 'Action', 'Attacking', 'ConquestTransfer', 'Finished']) {
     const row = campaignRow(campaign({ id: 'a/b', phase }))
-    assert.equal(row.action, phase === 'Finished' ? 'Review' : 'Resume')
-    assert.equal(row.href, '/play/a%2Fb')
+    assert.equal(row.action, phase === 'Finished' ? 'Watch replay' : 'Resume')
+    assert.equal(row.href, phase === 'Finished' ? '/replay/a%2Fb' : '/play/a%2Fb')
   }
+})
+
+test('resume mode contains every active phase and excludes all finished games', () => {
+  const games = [campaign({ id: 'win', phase: 'Finished', winnerPlayerId: 'human' }), ...['Reinforcing', 'Action', 'Attacking', 'ConquestTransfer'].map((phase, i) => campaign({ id: phase, phase, createdAt: `2026-02-0${i + 1}T12:00:00Z` }))]
+  assert.deepEqual(campaignsForMode(games, 'resume').map(game => game.id), ['ConquestTransfer', 'Attacking', 'Action', 'Reinforcing'])
+  assert.equal(games[0].id, 'win')
+})
+
+test('review mode contains only finished games, won or lost, newest first', () => {
+  const games = [campaign({ id: 'win', phase: 'Finished', winnerPlayerId: 'human' }), campaign({ id: 'active' }), campaign({ id: 'loss', phase: 'Finished', winnerPlayerId: 'npc', createdAt: '2026-11-01T12:00:00Z' })]
+  assert.deepEqual(campaignsForMode(games, 'review').map(game => game.id), ['loss', 'win'])
+  assert.ok(campaignsForMode(games, 'review').every(game => campaignRow(game).href.startsWith('/replay/')))
+  assert.ok(campaignsForMode(games, 'resume').every(game => campaignRow(game).href.startsWith('/play/')))
+})
+
+test('filtered empty states use the message for the requested mode', () => {
+  assert.deepEqual(campaignsForMode([campaign()], 'review'), [])
+  assert.deepEqual(campaignsForMode([campaign({ phase: 'Finished' })], 'resume'), [])
+  assert.equal(campaignEmptyMessage('review'), 'No finished games yet')
+  assert.equal(campaignEmptyMessage('resume'), 'No campaigns in progress')
+  assert.equal(campaignListState({ games: campaignsForMode([campaign()], 'review'), loading: false, error: '' }), 'empty')
 })
 
 test('country counts use singular only for one country', () => {

@@ -120,7 +120,7 @@ function GameScreen({ gameId }) {
   }
 
   return <GameLayout game={game} events={events} battle={battle} playback={playback} battleFast={battleFast}
-    headerExtras={<ShareLink gameId={game.id} />}
+    headerExtras={<ShareLink gameId={game.id} phase={game.phase} />}
     mapProps={{ onSelect: select, selectedFrom: selection.from, selectedTo: selection.to, disabled: locked, arrow, markers,
       reinforcement: playback.currentEvent?.type === 'ReinforcementsPlaced' ? playback.currentEvent : null }}
     controls={<ActionPanel key={`${mode}:${actionMode}:${game.round}:${game.activeAttack?.attackerCountryId}`} game={game} selection={selection} actionMode={actionMode} busy={locked} error={playback.error || error} playback={playback} onAction={perform} onMode={value => { setActionMode(value); setSelection(emptySelection) }} battleBoard={<BattleBoard board={battle.board} territories={game.territories} players={game.players} fastForward={battleFast} />} />} />

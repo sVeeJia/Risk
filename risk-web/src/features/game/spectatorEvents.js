@@ -29,4 +29,4 @@ export async function loadHistory(getPage, after = 0, limit = 200) {
   }
 }
 
-export const shareUrl = (origin, gameId) => `${origin.replace(/\/$/, '')}/watch/${encodeURIComponent(gameId)}`
+export const shareUrl = (origin, gameId, phase) => `${origin.replace(/\/$/, '')}/${phase === 'Finished' ? 'replay' : 'watch'}/${encodeURIComponent(gameId)}`
