@@ -63,4 +63,4 @@ export default function GameLayout({ game, events, battle, playback, battleFast,
       <EventLog events={events} currentSequence={playback.currentEvent?.sequence} onSeek={onSeekEvent} />
     </div>
   </main>
-}
+}
