@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Globe2, Shield } from 'lucide-react'
+import { Globe2, Shield } from 'lucide-react'
 import WorldMap from '../map/WorldMap.jsx'
 
 export default function HomeLayout({ headerActions, actions, onManual, children }) {
