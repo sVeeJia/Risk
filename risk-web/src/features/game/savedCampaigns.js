@@ -8,21 +8,25 @@ export const newestCampaigns = games => [...games].sort((a, b) => {
   return left === right ? 0 : left > right ? -1 : 1
 })
 
+export const campaignsForMode = (games, mode) => newestCampaigns(games.filter(game => (game.phase === 'Finished') === (mode === 'review')))
+export const campaignEmptyMessage = mode => mode === 'review' ? 'No finished games yet' : 'No campaigns in progress'
+
 export function campaignRow(game, locale) {
   const human = game.players?.find(player => player.isHuman)
   const current = game.players?.find(player => player.id === game.currentPlayerId)
   const finished = game.phase === 'Finished'
-  const result = finished && human ? game.winnerPlayerId === human.id ? 'Won'
-    : game.winnerPlayerId || human.isEliminated ? 'Lost' : null : null
+  const result = finished && human ? game.winnerPlayerId === human.id ? 'Won' : 'Lost' : null
+  const turn = finished ? result ?? 'Result unavailable' : current ? current.isHuman ? 'Your turn' : `${current.name} to play` : 'Turn unavailable'
   return {
     id: game.id,
     date: Number.isFinite(timestamp(game)) ? new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(game.createdAt)) : 'Unknown date',
     round: game.round,
-    turn: finished ? `Finished${result ? ` · ${result}` : ''}` : current ? current.isHuman ? 'Your turn' : `${current.name} to play` : 'Turn unavailable',
+    turn,
+    summary: finished ? `${game.round} ${game.round === 1 ? 'round' : 'rounds'} played · ${turn}` : `Round ${game.round} · ${turn}`,
     countries: human?.countriesOwned ?? null,
     countryLabel: human?.countriesOwned == null ? 'Countries unavailable' : `${human.countriesOwned} ${human.countriesOwned === 1 ? 'country' : 'countries'} owned`,
-    action: finished ? 'Review' : 'Resume',
-    href: `/play/${encodeURIComponent(game.id)}`,
+    action: finished ? 'Watch replay' : 'Resume',
+    href: `/${finished ? 'replay' : 'play'}/${encodeURIComponent(game.id)}`,
   }
 }
 

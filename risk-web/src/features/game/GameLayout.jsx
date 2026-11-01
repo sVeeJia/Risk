@@ -10,14 +10,14 @@ import WorldMap from '../map/WorldMap.jsx'
 import NpcDecisionCard from './NpcDecisionCard.jsx'
 import { useAuth } from '../../auth/useAuth.js'
 
-export default function GameLayout({ game, events, battle, playback, battleFast, controls, headerExtras, mapProps, readOnly = false }) {
+export default function GameLayout({ game, events, battle, playback, battleFast, controls, headerExtras, mapProps, readOnly = false, replay = false, onSeekEvent, presentationClass = '', animationSpeed = 1, mapOverlay }) {
   const { user } = useAuth()
   const mode = panelMode(game)
   const assignments = toAssignments(game, [], worldRegions)
   const current = game.players.find(player => player.id === game.currentPlayerId)
-  return <main className="game-page">
+  return <main className={`game-page ${presentationClass}`} style={{ '--replay-speed': animationSpeed }}>
     <header className="game-page-header">
-      <Button as={Link} variant="secondary" size="small" to={readOnly && !user ? '/' : '/play'} className="game-page-back"><ArrowLeft size={16} /> {readOnly ? 'Home' : 'Headquarters'}</Button>
+      <Button as={Link} variant="secondary" size="small" to={readOnly && !user ? '/' : '/play'} className="game-page-back"><ArrowLeft size={16} /> {replay ? user ? 'Headquarters' : 'Home' : readOnly ? 'Home' : 'Headquarters'}</Button>
       <h1>World conquest</h1>
       {headerExtras}
       <span className="game-page-round">Round {game.round} · {game.phase} phase</span>
@@ -28,9 +28,10 @@ export default function GameLayout({ game, events, battle, playback, battleFast,
         <WorldMap countryAssignments={assignments} showSoldiers territories={game.territories} players={game.players} battleHit={battle.hit} conquered={battle.conquered} fastForward={battleFast} liveCounts={battle.liveCounts} fitted {...mapProps} />
         </div>
         <NpcDecisionCard key={playback.decision?.event.sequence ?? 'no-decision'} decision={playback.decision} game={game} />
+        {mapOverlay}
       </section>
       <aside className="game-page-panel" aria-label="Game status">
-        {mode === 'finished' ? <GameOver game={game} readOnly={readOnly} /> : <>
+        {mode === 'finished' && !replay ? <GameOver game={game} readOnly={readOnly} /> : <>
         <section className="game-page-dock-players" aria-label="Players">
         <p className="eyebrow">PLAYERS</p>
         <ol className="game-page-players">
@@ -38,7 +39,7 @@ export default function GameLayout({ game, events, battle, playback, battleFast,
             <svg className="game-page-owner-dot" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill={worldRegions[ownerSlot(game, { ...game.territories.find(t => t.countryId === player.startingCountryId), ownerPlayerId: player.id }) - 1]?.color} /></svg>
             <div className="game-page-player-name">
               <strong title={player.name}>{player.name}</strong>{player.isHuman && !readOnly && <span className="game-page-you"> (you)</span>}
-              {player.pendingReinforcements > 0 && <span className="game-page-badge" aria-label={`${player.pendingReinforcements} pending reinforcements`}>+{player.pendingReinforcements}</span>}
+              {mode !== 'finished' && player.pendingReinforcements > 0 && <span className="game-page-badge" aria-label={`${player.pendingReinforcements} pending reinforcements`}>+{player.pendingReinforcements}</span>}
               {player.isEliminated && <span className="game-page-badge game-page-badge-eliminated" aria-label="Eliminated" title="Eliminated">×</span>}
             </div>
             <span className="assignment-soldiers" aria-label={`${game.territories.find(t => t.countryId === player.startingCountryId)?.soldiers ?? 0} soldiers in starting country`}>
@@ -49,17 +50,17 @@ export default function GameLayout({ game, events, battle, playback, battleFast,
         </section>
         <section className="game-page-dock-controls" aria-label="Current turn">
         <div className="game-page-control-heading">
-        <p className="eyebrow">CURRENT TURN</p>
+        <p className="eyebrow">{replay ? 'REPLAY' : 'CURRENT TURN'}</p>
         <p className="game-page-turn">
           {current && <svg className="game-page-owner-dot" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill={worldRegions[ownerSlot(game, { ...game.territories.find(t => t.countryId === current.startingCountryId), ownerPlayerId: current.id }) - 1]?.color} /></svg>}
-          {current?.isHuman ? (readOnly ? `${current.name} to play` : 'Your turn') : `${current?.name ?? 'Unknown'} to play`}
+          {mode === 'finished' ? 'Finished' : current?.isHuman ? (readOnly ? `${current.name} to play` : 'Your turn') : `${current?.name ?? 'Unknown'} to play`}
         </p>
         </div>
         {controls}
         </section>
         </>}
       </aside>
-      <EventLog events={events} currentSequence={playback.currentEvent?.sequence} />
+      <EventLog events={events} currentSequence={playback.currentEvent?.sequence} onSeek={onSeekEvent} />
     </div>
   </main>
 }

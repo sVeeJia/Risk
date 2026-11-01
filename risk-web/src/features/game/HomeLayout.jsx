@@ -10,7 +10,7 @@ export default function HomeLayout({ headerActions, actions, onManual, children 
       {headerActions}
     </header>
     <main className="command-main">
-      <section className="campaign-intro"><p className="eyebrow"><span /> WORLD CONQUEST · TURN-BASED STRATEGY</p><h1>ONE WORLD.<br /><em>ONE VICTOR.</em></h1><p className="intro-copy">Build your army. Forge your alliances.<br />Put your strategy on the map.</p></section>
+      <section className="campaign-intro"><p className="eyebrow"><span /> WORLD CONQUEST · TURN-BASED STRATEGY</p><h1>ONE WORLD.<br /><em>ONE VICTOR.</em></h1><p className="intro-copy">Build your army.<br />Put your strategy on the map.</p></section>
       <div className="atlas">
         <div className="atlas-top"><span><Globe2 size={14} /> WORLD THEATER</span><span>UNCHARTED / 01</span></div>
         <WorldMap />
@@ -19,7 +19,6 @@ export default function HomeLayout({ headerActions, actions, onManual, children 
       <section className="command-menu" aria-label="Game menu">
         <p className="eyebrow">YOUR CAMPAIGN STARTS HERE</p>
         <div className="home-actions">{actions}</div>
-        <button className="field-manual" onClick={onManual}>New to world conquest? <span>Read the field manual <ArrowRight size={13} /></span></button>
       </section>
     </main>
     {children}

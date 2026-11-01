@@ -47,6 +47,7 @@ test('snapshots only advance by numeric game.version; unversioned data is report
 
 test('share URLs use the public watch route and encode the game id', () => {
   assert.equal(shareUrl('https://risk.example/', 'a/b ?'), 'https://risk.example/watch/a%2Fb%20%3F')
+  assert.equal(shareUrl('https://risk.example/', 'a/b ?', 'Finished'), 'https://risk.example/replay/a%2Fb%20%3F')
 })
 
 test('queued actions replay serially against old snapshots, deduplicate and never roll versions back', async () => {
@@ -169,4 +170,10 @@ test('unmount stops an in-flight Watch immediately and only once', async () => {
   assert.deepEqual(hub.calls, ['start', 'Watch', 'StopWatching', 'stop'])
   gate.resolve(); await work
   assert.equal(hub.calls.filter(call => call === 'stop').length, 1)
+})
+
+test('a finished watch can hand off to replay before opening a hub connection', async () => {
+  await spectateSession({ id: 'g', signal: new AbortController().signal, getGame: async () => ({ ...game(1), phase: 'Finished' }), getEvents: async () => [],
+    createConnection: assert.fail, onInitial: () => false, onStatus: assert.fail, onError: assert.fail,
+  })
 })

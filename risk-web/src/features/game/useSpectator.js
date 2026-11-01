@@ -26,7 +26,10 @@ export default function useSpectator(gameId) {
       return spectateSession({ id: gameId, signal, getGame: api.getPublicGame, getEvents: api.getPublicGameEvents,
         createConnection: api.createGameConnection, onError,
         onStatus: status => update(previous => ({ ...previous, status })),
-        onInitial: (game, events) => update(() => ({ ...initial, game, events, battle: battlePresentation(emptyBattle, { type: 'load', game }) })),
+        onInitial: (game, events) => {
+          update(() => ({ ...initial, game, events, battle: battlePresentation(emptyBattle, { type: 'load', game }) }))
+          return game.phase !== 'Finished'
+        },
         createQueue: (game, lastSeenSequence) => createSpectatorQueue({ game, lastSeenSequence, signal,
           pause: kind => playbackPause(kind, () => speed.current, signal),
           onBusy: playing => update(previous => ({ ...previous, playing, currentEvent: playing ? previous.currentEvent : null, arrow: playing ? previous.arrow : null })),

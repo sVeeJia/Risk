@@ -6,5 +6,5 @@
 .saved-campaign-text { display: flex; flex: 1; flex-direction: column; min-width: 0; gap: 3px; color: #c6cdbe; }
 .saved-campaign-text time { font-weight: 600; color: #e0c38c; }
 .saved-campaign-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
-.saved-campaign-resume { flex-shrink: 0; min-width: 90px; }
-@media (max-width: 480px) { .saved-campaign-row { align-items: stretch; flex-direction: column; gap: 8px; } .saved-campaign-resume { align-self: flex-start; } }
+.saved-campaign-action { flex-shrink: 0; min-width: 90px; }
+@media (max-width: 480px) { .saved-campaign-row { align-items: stretch; flex-direction: column; gap: 8px; } .saved-campaign-action { align-self: flex-start; } }

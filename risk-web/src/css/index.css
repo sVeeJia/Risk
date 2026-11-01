@@ -20,6 +20,7 @@
 @import "./features/game-over.css";
 @import "./features/event-log.css";
 @import "./features/spectator.css";
+@import "./features/replay.css";
 @import "./pages/landing.css";
 @import "./pages/lobby.css";
 @import "./pages/login.css";
