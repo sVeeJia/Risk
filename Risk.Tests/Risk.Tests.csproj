@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Risk.Api\Risk.Api.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
 </Project>

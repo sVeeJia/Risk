@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Text;
 using Risk.Api.DesignPatterns;
 using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.DesignPatterns.Repository;
@@ -7,15 +8,16 @@ using Risk.Api.DesignPatterns.Factory.Interfaces;
 using Risk.Api.DesignPatterns.Factory;
 using Risk.Api.DesignPatterns.Strategy;
 using Risk.Api.DesignPatterns.Strategy.Interfaces;
+using Risk.Api.DesignPatterns.Observer.Interfaces;
 using Risk.Api.Services;
 using Risk.Api.Services.Interfaces;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using Risk.Api.Data;
 using Risk.Api.Data.Import;
+using Risk.Api.Realtime;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +45,9 @@ builder.Services.AddSingleton<IGameService, GameService>();
 builder.Services.AddSingleton<IGameEventRepository, GameEventRepository>();
 builder.Services.AddSingleton<IGameplayService, GameplayService>();
 builder.Services.AddSingleton<INpcStrategy, OpportunistStrategy>();
+builder.Services.AddSingleton<IPublicGameService, PublicGameService>();
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IGameObserver, SignalRGameObserver>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");
@@ -92,7 +97,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("web", policy => policy
         .WithOrigins(allowedOrigins)
         .WithMethods("GET", "POST", "PUT", "DELETE")
-        .WithHeaders("Content-Type")
+        .WithHeaders("Content-Type", "x-requested-with", "x-signalr-user-agent")
         .AllowCredentials());
 });
 
