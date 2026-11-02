@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { parseDice, pairDice, battleFromEvent, liveCountsFromEvent, markersFromAttack } from './battle.js'
-import { battlePresentation, emptyBattle } from './battlePresentation.js'
-import { replayNpcTurns } from './npcPlayback.js'
+import { parseDice, pairDice, battleFromEvent, liveCountsFromEvent, markersFromAttack } from '../battle.js'
+import { battlePresentation, emptyBattle } from '../battlePresentation.js'
+import { replayNpcTurns } from '../npcPlayback.js'
 
 const attack = { attackerCountryId: 'PE', defenderCountryId: 'DM' }
 const started = { type: 'AttackStarted', sequence: 1, data: { fromCountryId: 'PE', toCountryId: 'DM', attackerSoldiers: '7', defenderSoldiers: '3' } }

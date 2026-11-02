@@ -1,9 +1,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { mergeEvents, newerGame, loadHistory, shareUrl } from './spectatorEvents.js'
-import { createSpectatorQueue } from './spectatorQueue.js'
-import { spectateSession, isGameNotFound } from './spectatorSession.js'
-import { battlePresentation, emptyBattle } from './battlePresentation.js'
+import { mergeEvents, newerGame, loadHistory, shareUrl } from '../spectatorEvents.js'
+import { createSpectatorQueue } from '../spectatorQueue.js'
+import { spectateSession, isGameNotFound } from '../spectatorSession.js'
+import { battlePresentation, emptyBattle } from '../battlePresentation.js'
 
 const event = sequence => ({ sequence, type: 'TurnSkipped' })
 const game = version => ({ id: 'g', version, round: 1, phase: 'Action', currentPlayerId: 'human' })

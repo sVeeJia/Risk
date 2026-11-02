@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { normal, fast, playbackSpeed, playbackPause } from './playbackSpeed.js'
+import { normal, fast, playbackSpeed, playbackPause } from '../playbackSpeed.js'
 
 test('playbackSpeed supplies the exact normal and fast delays', () => {
   assert.deepEqual(normal, { eventPause: 800, turnPause: 1200 })

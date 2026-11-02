@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom'
 import { Globe2, Shield } from 'lucide-react'
 import WorldMap from '../map/WorldMap.jsx'
 
-export default function HomeLayout({ headerActions, actions, onManual, children }) {
+export default function HomeLayout({ headerActions, actions, children }) {
   return <div className="game-shell">
     <header className="game-header">
       <Link to="/" className="brand"><Shield size={27} strokeWidth={1.5} /><span>GEOPOLITICS<small>THE WORLD IS YOURS TO TAKE</small></span></Link>
-      <nav aria-label="Main navigation"><span className="nav-active">HEADQUARTERS</span><button onClick={onManual}>HOW TO PLAY</button></nav>
+      <nav aria-label="Main navigation"><span className="nav-active">MAIN MENU</span></nav>
       {headerActions}
     </header>
     <main className="command-main">
