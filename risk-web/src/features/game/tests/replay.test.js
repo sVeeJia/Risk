@@ -1,9 +1,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { completeGame, completeEvents } from './replay.fixture.js'
-import { initialReplayState, applyReplayEvent, replayDifferences } from './replayState.js'
-import { buildTimeline, stateAt, totalTime, replayMarkers } from './replayTimeline.js'
-import { seekTime, seekFraction, skipTime, pacedDuration, replaySpeeds, heavyAnimation, stackFlags, timeLabel } from './replayNavigation.js'
+import { initialReplayState, applyReplayEvent, replayDifferences } from '../replayState.js'
+import { buildTimeline, stateAt, totalTime, replayMarkers } from '../replayTimeline.js'
+import { seekTime, seekFraction, skipTime, pacedDuration, replaySpeeds, heavyAnimation, stackFlags, timeLabel } from '../replayNavigation.js'
 
 const initial = () => initialReplayState(completeGame, completeEvents)
 const timeline = () => buildTimeline(initial(), completeEvents)

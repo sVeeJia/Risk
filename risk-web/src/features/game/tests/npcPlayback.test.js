@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { replayNpcTurns } from './npcPlayback.js'
+import { replayNpcTurns } from '../npcPlayback.js'
 
 const players = [{ id: 'human', isHuman: true }, { id: 'npc1' }, { id: 'npc2' }]
 const game = currentPlayerId => ({ currentPlayerId, phase: 'Action', players })

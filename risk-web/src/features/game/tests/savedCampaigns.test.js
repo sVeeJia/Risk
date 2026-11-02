@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { campaignEmptyMessage, campaignListState, campaignRow, campaignsForMode, loadSavedCampaigns, newestCampaigns } from './savedCampaigns.js'
+import { campaignEmptyMessage, campaignListState, campaignRow, campaignsForMode, loadSavedCampaigns, newestCampaigns } from '../savedCampaigns.js'
 
 const campaign = overrides => ({ id: 'old', createdAt: '2026-01-15T12:00:00Z', round: 4, phase: 'Action', currentPlayerId: 'npc',
   players: [{ id: 'human', name: 'Alice', isHuman: true, countriesOwned: 3 }, { id: 'npc', name: 'China', isHuman: false }], ...overrides })
