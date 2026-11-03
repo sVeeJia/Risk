@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Risk.Api.Data;
 using Risk.Api.Data.Import;
 using Risk.Api.Realtime;
+using Risk.Api.Commentary;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,6 +49,12 @@ builder.Services.AddSingleton<INpcStrategy, OpportunistStrategy>();
 builder.Services.AddSingleton<IPublicGameService, PublicGameService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IGameObserver, SignalRGameObserver>();
+
+// AI commentary: asks Mistral when an API key is set, and uses ready-made sentences otherwise or when Mistral fails.
+builder.Services.AddHttpClient(CommentaryGenerator.ClientName, client => client.BaseAddress = new Uri("https://api.mistral.ai/"));
+builder.Services.AddSingleton<ICommentaryGenerator>(sp => new CommentaryGenerator(sp.GetRequiredService<IHttpClientFactory>(),
+    builder.Configuration["Mistral:ApiKey"],sp.GetRequiredService<ILogger<CommentaryGenerator>>()));
+builder.Services.AddSingleton<ICommentaryService, CommentaryService>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");

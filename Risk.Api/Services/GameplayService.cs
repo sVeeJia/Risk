@@ -6,6 +6,7 @@ using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.DesignPatterns.Strategy.Interfaces;
 using Risk.Api.Models;
 using Risk.Api.Services.Interfaces;
+using Risk.Api.Commentary;
 
 namespace Risk.Api.Services;
 
@@ -15,17 +16,20 @@ public sealed class GameplayService : IGameplayService
     private readonly IGameEventRepository _events;
     private readonly INpcStrategy _npcStrategy;
     private readonly IReadOnlyList<IGameObserver> _observers;
+    private readonly ICommentaryService? _commentary;
 
     public GameplayService(
         IGameRepository games,
         IGameEventRepository events,
         INpcStrategy npcStrategy,
-        IEnumerable<IGameObserver>? observers = null)
+        IEnumerable<IGameObserver>? observers = null,
+        ICommentaryService? commentary = null)
     {
         _games = games;
         _events = events;
         _npcStrategy = npcStrategy;
         _observers = observers?.ToList() ?? new List<IGameObserver>();
+        _commentary = commentary;
     }
 
     public Task<GameplayResult> StartAttackAsync(string userId, string gameId, string fromCountryId, string toCountryId, CancellationToken ct = default) =>
@@ -70,8 +74,11 @@ public sealed class GameplayService : IGameplayService
             return GameplayResult.Rejected(result.Error!);
         }
 
-        // Save the game first (with the version check), and only then the events,
-        // so a collision never leaves duplicate event numbers behind.
+        // Add the battle commentary before saving, so it is stored and sent together with the events it describes.
+        await AddCommentaryAsync(game, log, ct);
+        
+
+        // Save the game first (with the version check), and only then the events, so a collision never leaves duplicate event numbers behind.
         if (!await _games.UpdateAsync(game, ct))
         {
             return GameplayResult.Conflict();
@@ -99,6 +106,19 @@ public sealed class GameplayService : IGameplayService
                 // A failing observer (for example a dropped live connection) must never fail the player's action.
                 // Observers log their own errors.
             }
+        }
+    }
+    private async Task AddCommentaryAsync(Game game, EventLog log, CancellationToken ct)
+    {
+        if (_commentary is null) return;
+
+        try
+        {
+            await _commentary.AddAsync(game, log, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // Commentary is decoration: if it fails, the game carries on without it.
         }
     }
 }
