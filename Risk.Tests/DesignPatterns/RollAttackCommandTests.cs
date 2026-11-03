@@ -183,4 +183,17 @@ public class RollAttackCommandTests
         Assert.Equal(Attacker(first).Soldiers, Attacker(second).Soldiers);
         Assert.Equal(Defender(first).Soldiers, Defender(second).Soldiers);
     }
+
+    [Fact]
+    public void Execute_RecordsWhichCountriesFought_InTheBattleRoundEvent()
+    {
+        var game = AttackInProgress(5, 3);
+        var log = new EventLog(game.Id);
+
+        Assert.True(new RollAttackCommand(game.Human().Id).Execute(game, log).Success);
+
+        var round = Assert.Single(log.Events, e => e.Type == EventType.BattleRound);
+        Assert.Equal(game.Human().StartingCountryId, round.Data["fromCountryId"]);
+        Assert.Equal(game.EnemyCountry(), round.Data["toCountryId"]);
+    }
 }
