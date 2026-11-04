@@ -1,0 +1,16 @@
+.npc-decision-card { position: absolute; z-index: 3; top: 12px; right: 12px; box-sizing: border-box; width: 300px; min-width: 220px; height: 140px; max-height: calc(100% - 24px); overflow: hidden; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px solid #52645b; border-radius: 6px; background: #10191cf2; box-shadow: 0 4px 16px #0006; pointer-events: none; }
+.npc-decision-card header { display: flex; align-items: center; gap: 8px; min-width: 0; color: #e0c38c; font-size: 12px; }
+.npc-decision-card header svg { width: 10px; height: 10px; flex-shrink: 0; border: 1px solid #ffffff40; border-radius: 50%; }
+.npc-decision-card header strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.npc-decision-card p { margin: 0; font-size: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.npc-decision-why { font-style: italic; color: #94a09e; }
+.npc-decision-card-ended { animation: npc-decision-exit 180ms ease-out forwards; }
+@keyframes npc-decision-exit { to { opacity: 0; } }
+@container (max-width: 899px) { .npc-decision-card { width: 220px; padding: 10px; } }
+@container (max-width: 699px) {
+  .npc-decision-card { width: calc((100% - 36px) / 2); min-width: 0; height: 34px; padding: 8px; }
+  .npc-decision-card header, .npc-decision-card .npc-decision-why { display: none; }
+  .npc-decision-card .npc-decision-message { display: block; white-space: nowrap; text-overflow: ellipsis; font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .npc-decision-card-ended { animation: none; opacity: 0; } }
+.npc-decision-card { width: clamp(160px, calc((100cqw - min(100cqw, 100cqh * 928 / 482)) / 2 - 24px), 300px); min-width: 0; }

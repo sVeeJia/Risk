@@ -34,6 +34,17 @@ test('getGame and listGames use the expected authenticated GET endpoints', async
   assert.deepEqual(paths, ['/api/games/game-1', '/api/games'])
 })
 
+test('listing saved games forwards cancellation to the existing endpoint', async t => {
+  const controller = new AbortController()
+  t.mock.method(globalThis, 'fetch', async (path, options) => {
+    assert.equal(path, '/api/games')
+    assert.equal(options.signal, controller.signal)
+    assert.equal(options.credentials, 'same-origin')
+    return Response.json([])
+  })
+  assert.deepEqual(await listGames({ signal: controller.signal }), [])
+})
+
 test('failed game creation exposes ApiError status and message for non-2xx responses', async t => {
   for (const status of [400, 401, 500]) {
     const message = `Game request failed (${status})`

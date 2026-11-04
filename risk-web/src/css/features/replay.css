@@ -1,0 +1,31 @@
+.replay-controls { display: flex; flex: 1; flex-direction: column; gap: 5px; min-height: 0; min-width: 0; }
+.replay-display { display: flex; flex: 1; align-items: center; justify-content: center; gap: 12px; min-height: 0; min-width: 0; container-type: size; container-name: battle-slot; overflow: clip; }
+.replay-display .battle-board { flex-shrink: 1; }
+.replay-display > p { flex: 0 1 160px; margin: 0; font-size: 12px; color: #94a09e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.replay-transport { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 8px; flex-shrink: 0; }
+.replay-buttons, .replay-speeds { display: flex; gap: 4px; min-width: 0; }
+.replay-transport .game-button { min-width: 0; min-height: 28px; height: 28px; padding: 3px 7px; font-size: 11px; white-space: nowrap; }
+.replay-speeds .game-button { padding-inline: 6px; }
+.replay-progress { flex-shrink: 0; width: 100%; min-width: 0; }
+.replay-time { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; line-height: 14px; color: #94a09e; font-variant-numeric: tabular-nums; }
+.replay-progress-rail { position: relative; height: 60px; min-width: 0; }
+.replay-progress input { position: absolute; bottom: 0; left: 0; width: 100%; height: 18px; margin: 0; accent-color: #c6ae7e; cursor: pointer; }
+.replay-marker-lines { position: absolute; inset: 0; pointer-events: none; stroke: #77c4a650; stroke-width: 1; }
+.replay-marker { position: absolute; z-index: 1; display: grid; place-items: center; transform: translateX(-50%); height: 13px; border: 0; padding: 0; background: #172325; color: #77c4a6; cursor: pointer; }
+.replay-marker svg { width: 100%; height: 12px; }
+.replay-marker-gameOver { color: #e0c38c; }
+.replay-marker:focus-visible { outline: 2px solid #e0c38c; outline-offset: 1px; z-index: 2; }
+.replay-notice { color: #c6ae7e; font-size: 11px; }
+.replay-result { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); padding: 8px 16px; border: 1px solid #c6ae7e; background: #10191cf2; color: #e0c38c; border-radius: 4px; font-size: 14px; pointer-events: none; }
+.replay-page .event-log li[role="button"] { cursor: pointer; }
+.replay-page .event-log li[role="button"]:hover { background: #c6ae7e12; }
+.replay-page .battle-board { --roll-duration: calc(450ms / var(--replay-speed)); --pair-delay: calc(40ms / var(--replay-speed)); }
+.replay-page .attack-markers { --hit-duration: calc(700ms / var(--replay-speed)); --conquer-duration: calc(1200ms / var(--replay-speed)); }
+.replay-page .attack-glow { animation-duration: calc(1400ms / var(--replay-speed)); }
+.replay-page .map-arrow, .replay-page .map-reinforcement { animation-duration: calc(800ms / var(--replay-speed)); }
+.replay-static .battle-die svg, .replay-static .battle-die-pips, .replay-static .attack-markers *, .replay-static .map-arrows *, .replay-static .npc-decision-card { animation: none !important; transition: none !important; }
+.replay-static .battle-die-pips { opacity: 1; }
+.replay-page .battle-board-static .battle-die svg, .replay-page .battle-board-static .battle-die-pips { animation: none; }
+.replay-paused .battle-die svg, .replay-paused .battle-die-pips, .replay-paused .attack-markers *, .replay-paused .map-arrows * { animation-play-state: paused; }
+@media (max-width: 759px) { .replay-display > p { flex-basis: 120px; } .replay-time { font-size: 9px; } }
+@media (prefers-reduced-motion: reduce) { .replay-page *, .replay-page *::before, .replay-page *::after { animation: none !important; transition: none !important; } }

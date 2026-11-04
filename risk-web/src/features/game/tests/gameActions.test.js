@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { findHuman, isMyTurn, isNpcTurn, ownedBy, maxMovable, panelMode, ownerSlot, quickAmounts, clampAmount, stepAmount } from './gameActions.js'
+import { findHuman, isMyTurn, isNpcTurn, ownedBy, maxMovable, panelMode, ownerSlot, quickAmounts, clampAmount, stepAmount } from '../gameActions.js'
 
 const human = { id: 'human', isHuman: true }
 const npc = { id: 'npc', isHuman: false }

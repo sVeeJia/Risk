@@ -1,6 +1,6 @@
-﻿import assert from 'node:assert/strict'
+import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { toAssignments } from './boardAssignments.js'
+import { toAssignments } from '../boardAssignments.js'
 
 const regions = Array.from({ length: 10 }, (_, i) => ({ id: `R${i + 1}` }))
 const countries = Array.from({ length: 10 }, (_, i) => ({

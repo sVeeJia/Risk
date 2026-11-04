@@ -54,6 +54,8 @@ public sealed class RollAttackCommand : IGameCommand
             $"{defender.Name} loses {round.DefenderLosses}.",
             data: new Dictionary<string, string>
             {
+                ["fromCountryId"] = attacker.CountryId,
+                ["toCountryId"] = defender.CountryId,
                 ["attackerDice"] = string.Join(",", round.AttackerDice),
                 ["defenderDice"] = string.Join(",", round.DefenderDice),
                 ["attackerLosses"] = round.AttackerLosses.ToString(),

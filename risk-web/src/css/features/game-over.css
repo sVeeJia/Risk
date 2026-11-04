@@ -1,11 +1,13 @@
-.game-over { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 16px; height: 100%; }
-.game-over-info { min-height: 0; overflow-y: auto; }
+.game-over { display: flex; flex-direction: column; min-height: 0; height: 100%; gap: 6px; }
+.game-over-body { flex: 1; min-height: 0; }
+.game-over-info, .game-over-summary { min-width: 0; min-height: 0; }
 .game-over h2 { color: #e0c38c; font: 20px Georgia, serif; margin: 4px 0; }
 .game-over p { font-size: 12px; margin: 4px 0; }
 .game-over h3 { font-size: 12px; margin: 6px 0; }
 .game-over ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; list-style: none; padding: 0; margin: 0; }
 .game-over li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid #52645b; font-size: 11px; }
-.game-over li span { min-width: 0; overflow-wrap: anywhere; }
-.game-over-links { display: grid; align-content: end; gap: 8px; min-width: 0; }
-.game-over-links .game-button { width: 100%; }
-@media (max-width: 759px) { .game-over { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; } }
+.game-over li span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.game-over-links { box-sizing: border-box; display: flex; flex: 0 0 44px; height: 44px; gap: 8px; min-width: 0; padding: 3px 2px 2px; border-top: 1px solid #52645b; }
+.game-over-links .game-button { flex: 1; min-width: 0; height: 38px; min-height: 38px; padding: 5px 8px; font-size: 12px; }
+.game-over-info, .game-over-summary { align-self: center; }
+
