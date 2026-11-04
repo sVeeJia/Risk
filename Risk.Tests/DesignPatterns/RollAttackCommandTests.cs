@@ -9,6 +9,36 @@ namespace Risk.Tests.DesignPatterns;
 
 public class RollAttackCommandTests
 {
+    [Fact]
+    public void Execute_ConqueringTheHumansLastCountry_FinishesImmediatelyAndLogsLossOnce()
+    {
+        var game = TestGames.HumanFirst(humanSoldiers: 1, enemySoldiers: 9);
+        game.GiveTurnToAnNpc();
+        game.Round = 2;
+        var npc = game.Players.First(p => !p.IsHuman);
+        var log = new EventLog(game.Id);
+        var queue = game.TurnQueue.ToArray();
+        Assert.True(new StartAttackCommand(npc.Id, npc.StartingCountryId, game.Human().StartingCountryId).Execute(game, log).Success);
+        var command = new RollAttackCommand(npc.Id, new FakeScriptedRandomDiceRolls(6, 1));
+
+        Assert.True(command.Execute(game, log).Success);
+
+        Assert.Equal(GamePhase.Finished, game.Phase);
+        Assert.True(game.Human().IsEliminated);
+        Assert.Empty(game.Human().OwnedCountryIds);
+        Assert.Null(game.ActiveAttack);
+        Assert.Null(game.WinnerPlayerId);
+        Assert.Equal(game.Human().Id, Assert.Single(log.Events, e => e.Type == EventType.GameLost).PlayerId);
+        Assert.Equal(EventType.GameLost, log.Events[^1].Type);
+        Assert.False(command.Execute(game, log).Success);
+        TurnFlow.Advance(game, log);
+        Assert.Single(log.Events, e => e.Type == EventType.GameLost);
+        Assert.DoesNotContain(log.Events, e => e.Type is EventType.TurnStarted or EventType.ReinforcementsReceived);
+        Assert.Equal(queue, game.TurnQueue.ToArray());
+        Assert.Equal(2, game.Round);
+        Assert.All(game.Players, player => Assert.Equal(0, player.PendingReinforcements));
+    }
+
     // A game where the human has already started an attack on the first NPC's country.
     private static Game AttackInProgress(int humanSoldiers, int enemySoldiers)
     {
@@ -152,5 +182,18 @@ public class RollAttackCommandTests
         Assert.Equal(first.RngRollsUsed, second.RngRollsUsed);
         Assert.Equal(Attacker(first).Soldiers, Attacker(second).Soldiers);
         Assert.Equal(Defender(first).Soldiers, Defender(second).Soldiers);
+    }
+
+    [Fact]
+    public void Execute_RecordsWhichCountriesFought_InTheBattleRoundEvent()
+    {
+        var game = AttackInProgress(5, 3);
+        var log = new EventLog(game.Id);
+
+        Assert.True(new RollAttackCommand(game.Human().Id).Execute(game, log).Success);
+
+        var round = Assert.Single(log.Events, e => e.Type == EventType.BattleRound);
+        Assert.Equal(game.Human().StartingCountryId, round.Data["fromCountryId"]);
+        Assert.Equal(game.EnemyCountry(), round.Data["toCountryId"]);
     }
 }

@@ -12,8 +12,9 @@ public enum EventType
     CountryConquered,
     AttackEnded,
     TurnSkipped,
-    NpcDecision,
     Commentary,
     PlayerEliminated,
-    GameWon
+    GameWon,
+    NpcDecision,
+    GameLost
 }

@@ -28,7 +28,7 @@ public static class GameMapper
             .ToList();
 
         var players = game.Players
-            .Select(p => new PlayerResponse(p.Id, p.Name, p.IsHuman, p.StartingCountryId, p.OwnedCountryIds.Count, p.IsEliminated))
+            .Select(p => new PlayerResponse(p.Id, p.Name, p.IsHuman, p.StartingCountryId, p.OwnedCountryIds.Count, p.IsEliminated, p.PendingReinforcements))            
             .ToList();
 
         var currentPlayerId = game.TurnQueue.Count > 0 ? game.TurnQueue.Peek() : null;
@@ -46,7 +46,8 @@ public static class GameMapper
             game.ActiveAttack is null
                 ? null
                 : new AttackResponse(game.ActiveAttack.AttackerCountryId, game.ActiveAttack.DefenderCountryId),
-            game.AttackedThisTurn);
+            game.AttackedThisTurn,
+            game.Version);
     }
 
     public static GameSummaryResponse ToSummary(Game game)

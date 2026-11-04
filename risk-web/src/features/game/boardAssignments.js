@@ -1,4 +1,6 @@
-// Territory slot N (1 to 10) on the server is the map shape at index N - 1 in worldRegions.
+import { ownerSlot } from './gameActions.js'
+
+// Territory slots fix map positions; owner slots determine colours.
 export function toAssignments(game, countries, regions) {
   if (game.territories.length !== regions.length) {
     throw new Error('The server returned an unexpected board.')
@@ -16,6 +18,7 @@ export function toAssignments(game, countries, regions) {
         ?? { id: territory.countryId, name: territory.name, population: 0 }
       return {
         territoryId: regions[index].id,
+        colorSlot: ownerSlot(game, territory),
         // Soldiers always come from the server's game.
         country: { ...listed, soldiers: territory.soldiers },
       }

@@ -1,10 +1,5 @@
 // Fictional ten-territory board: three central lands and seven surrounding islands.
 // Coordinates use a 960 x 500 SVG. Edit shapes here without changing region IDs.
-export const regionGroups = [
-  { id: 'center', name: 'Central territories', territoryCount: 3, color: '#c6aa68' },
-  { id: 'outer', name: 'Surrounding territories', territoryCount: 7, color: '#729d9a' },
-]
-
 // Stable irregular coastlines keep the same board for server-assigned countries.
 // [ID, name, group, label position, color, polygon]
 const territories = [

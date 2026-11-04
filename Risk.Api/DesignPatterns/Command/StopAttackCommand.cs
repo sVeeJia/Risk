@@ -27,6 +27,10 @@ public sealed class StopAttackCommand : IGameCommand
         }
 
         AttackSteps.End(game, log, player, AttackEndReason.Stopped);
+        
+        // Stopping an attack ends the player's turn.
+        TurnFlow.Advance(game, log);
+        
         return CommandResult.Ok();
     }
 }

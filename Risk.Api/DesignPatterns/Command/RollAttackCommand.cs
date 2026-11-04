@@ -54,6 +54,8 @@ public sealed class RollAttackCommand : IGameCommand
             $"{defender.Name} loses {round.DefenderLosses}.",
             data: new Dictionary<string, string>
             {
+                ["fromCountryId"] = attacker.CountryId,
+                ["toCountryId"] = defender.CountryId,
                 ["attackerDice"] = string.Join(",", round.AttackerDice),
                 ["defenderDice"] = string.Join(",", round.DefenderDice),
                 ["attackerLosses"] = round.AttackerLosses.ToString(),
@@ -102,6 +104,14 @@ public sealed class RollAttackCommand : IGameCommand
         {
             previousOwner.IsEliminated = true;
             log.Append(EventType.PlayerEliminated, previousOwner.Id, $"{previousOwner.Name} has been eliminated.");
+            if (previousOwner.IsHuman)
+            {
+                AttackSteps.End(game, log, player, AttackEndReason.Conquest);
+                game.Phase = GamePhase.Finished;
+                game.WinnerPlayerId = null;
+                log.Append(EventType.GameLost, previousOwner.Id, $"{previousOwner.Name} has lost every country. The game is over.");
+                return;
+            }
         }
 
         if (player.OwnedCountryIds.Count == game.Territories.Count)

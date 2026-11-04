@@ -11,3 +11,18 @@
 .fictional-map .region-label { font-size: 12px; letter-spacing: .15px; }
 .fictional-region-code { fill: #fff5d9; paint-order: stroke; stroke: #142426; stroke-width: 2px; stroke-linejoin: round; font: bold 8px monospace; letter-spacing: 1px; pointer-events: none; }
 .fictional-map .region-start .continent { stroke-width: 4; }
+.map-selectable { cursor: pointer; }
+.map-selectable .continent { stroke: var(--owner-color, #94a09e); stroke-width: 4; transition: none; }
+.owner-0 { --owner-color: #d8b873; }
+.owner-1 { --owner-color: #69c3d0; }
+.owner-2 { --owner-color: #d98da4; }
+.owner-3 { --owner-color: #a7cf7a; }
+.owner-4 { --owner-color: #b8a0dc; }
+.owner-5 { --owner-color: #df9a62; }
+.owner-6 { --owner-color: #77c4a6; }
+.owner-7 { --owner-color: #e0cd8d; }
+.owner-8 { --owner-color: #819ee0; }
+.owner-9 { --owner-color: #c6cdbe; }
+.map-selectable.map-selected-from .continent { stroke-width: 7; stroke-dasharray: 10 4; }
+.map-selectable.map-selected-to .continent { stroke-width: 7; stroke-dasharray: 2 4; }
+.map-selectable:focus-visible .continent { stroke-width: 8; }

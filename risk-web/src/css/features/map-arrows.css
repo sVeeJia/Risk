@@ -1,0 +1,9 @@
+.map-arrows { pointer-events: none; }
+.map-arrow path { fill: none; stroke-width: 4; stroke-linecap: round; }
+.map-arrow-attack path { stroke: #ef815d; }
+.map-arrow-move path { stroke: #77c4a6; }
+.map-arrow-preview path { stroke-dasharray: 10 7; }
+.map-arrow text, .map-reinforcement { fill: #77c4a6; font: bold 18px Arial, sans-serif; text-anchor: middle; paint-order: stroke; stroke: #172325; stroke-width: 4px; }
+.map-arrow-transient { animation: move-arrow-fade 2s forwards; }
+@keyframes move-arrow-fade { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .map-arrow-transient { animation: none; } }

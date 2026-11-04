@@ -7,4 +7,7 @@ public interface IGamePhaseState
     string? CheckCanRoll();
     string? CheckCanStopAttack();
     string? CheckCanTransferAfterConquest();
+    string? CheckCanPlaceReinforcements();
+    string? CheckCanTransfer();
+    string? CheckCanEndTurn();
 }

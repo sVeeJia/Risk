@@ -121,6 +121,14 @@ public class GameFactoryTests
     }
 
     [Fact]
-    public void Create_ChosenCountryNotPlayable_Throws() =>
-        Assert.Throws<ArgumentException>(() => Create(chosen: "ZZ"));
+    public void Create_ChosenCountryNotPlayable_Throws() => Assert.Throws<ArgumentException>(() => Create(chosen: "ZZ"));
+
+    [Fact]
+    public void Create_RoundStarterIsTheFirstPlayerInTheTurnQueue()
+    {
+        var game = Create();
+
+        Assert.Equal(game.TurnQueue.Peek(), game.RoundStartPlayerId);
+    }
+
 }

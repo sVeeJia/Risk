@@ -14,7 +14,8 @@ public sealed record PlayerResponse(
     bool IsHuman,
     string StartingCountryId,
     int CountriesOwned,
-    bool IsEliminated);
+    bool IsEliminated,
+    int PendingReinforcements);
 
 public sealed record AttackResponse(string AttackerCountryId, string DefenderCountryId);
 
@@ -28,4 +29,5 @@ public sealed record GameResponse(
     IReadOnlyList<PlayerResponse> Players,
     DateTime CreatedAt,
     AttackResponse? ActiveAttack,
-    bool AttackedThisTurn);
+    bool AttackedThisTurn,
+    long Version);

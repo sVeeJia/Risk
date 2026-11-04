@@ -1,19 +1,24 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Text;
 using Risk.Api.DesignPatterns;
 using Risk.Api.DesignPatterns.Repository.Interfaces;
 using Risk.Api.DesignPatterns.Repository;
 using Risk.Api.DesignPatterns.Factory.Interfaces;
 using Risk.Api.DesignPatterns.Factory;
+using Risk.Api.DesignPatterns.Strategy;
+using Risk.Api.DesignPatterns.Strategy.Interfaces;
+using Risk.Api.DesignPatterns.Observer.Interfaces;
 using Risk.Api.Services;
 using Risk.Api.Services.Interfaces;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using Risk.Api.Data;
 using Risk.Api.Data.Import;
+using Risk.Api.Realtime;
+using Risk.Api.Commentary;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +45,16 @@ builder.Services.AddSingleton<IGameFactory, GameFactory>();
 builder.Services.AddSingleton<IGameService, GameService>();
 builder.Services.AddSingleton<IGameEventRepository, GameEventRepository>();
 builder.Services.AddSingleton<IGameplayService, GameplayService>();
+builder.Services.AddSingleton<INpcStrategy, OpportunistStrategy>();
+builder.Services.AddSingleton<IPublicGameService, PublicGameService>();
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IGameObserver, SignalRGameObserver>();
+
+// AI commentary: asks Mistral when an API key is set, and uses ready-made sentences otherwise or when Mistral fails.
+builder.Services.AddHttpClient(CommentaryGenerator.ClientName, client => client.BaseAddress = new Uri("https://api.mistral.ai/"));
+builder.Services.AddSingleton<ICommentaryGenerator>(sp => new CommentaryGenerator(sp.GetRequiredService<IHttpClientFactory>(),
+    builder.Configuration["Mistral:ApiKey"],sp.GetRequiredService<ILogger<CommentaryGenerator>>()));
+builder.Services.AddSingleton<ICommentaryService, CommentaryService>();
 
 // Configure JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not set.");
@@ -89,7 +104,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("web", policy => policy
         .WithOrigins(allowedOrigins)
         .WithMethods("GET", "POST", "PUT", "DELETE")
-        .WithHeaders("Content-Type")
+        .WithHeaders("Content-Type", "x-requested-with", "x-signalr-user-agent")
         .AllowCredentials());
 });
 
@@ -130,6 +145,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<GameHub>("/hubs/game");
 
 // check to see if mongo is connected
 app.MapGet("/health/db", async (IMongoClient client) =>
