@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# npm cache
+.npm-cache/
+
 # User-specific files
 *.rsuser
 *.suo

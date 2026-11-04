@@ -22,7 +22,7 @@ public sealed class TokenService : ITokenService
         _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         _issuer = config["Jwt:Issuer"] ?? throw new InvalidOperationException("Jwt:Issuer is not set.");
         _audience = config["Jwt:Audience"] ?? throw new InvalidOperationException("Jwt:Audience is not set.");
-        _expiryMinutes = int.TryParse(config["Jwt:ExpiryMinutes"], out var minutes) ? minutes : 15;
+        _expiryMinutes = int.TryParse(config["Jwt:ExpiryMinutes"], out var minutes) ? minutes : 120;
     }
 
     public TokenResult CreateToken(User user)
