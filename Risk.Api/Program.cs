@@ -155,6 +155,12 @@ var app = builder.Build();
 // The strict content policy would break Swagger in development, so it is only added outside it.
 app.UseSecurityHeaders(includeContentSecurityPolicy: !app.Environment.IsDevelopment());
 
+// In production the API also serves the built frontend, so the app, the API and live viewing share one address.
+var webRoot = app.Environment.WebRootPath;
+var servesFrontend = !app.Environment.IsEnvironment("Testing")
+    && webRoot is not null
+    && File.Exists(Path.Combine(webRoot, "index.html"));
+
 // Configure the HTTP request pipeline.
 // swagger is only enabled in development mode, so that the API is not exposed to the public
    if (app.Environment.IsDevelopment())
@@ -165,6 +171,12 @@ app.UseSecurityHeaders(includeContentSecurityPolicy: !app.Environment.IsDevelopm
 
 app.UseHttpsRedirection();
 
+if (servesFrontend)
+{
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+}
+
 app.UseCors("web");
 
 app.UseAuthentication();
@@ -173,6 +185,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<GameHub>("/hubs/game");
+
+// A plain health check for the hosting platform. It does not touch the database.
+app.MapGet("/health", () => Results.Ok("ok"));
+
+// Any other page address opens the app, so refreshing /play/... or /replay/... works.
+if (servesFrontend)
+{
+    app.MapFallbackToFile("index.html");
+}
 
 // check to see if mongo is connected (development only)
 if (app.Environment.IsDevelopment())
