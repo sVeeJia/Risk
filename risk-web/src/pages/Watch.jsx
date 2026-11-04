@@ -1,3 +1,4 @@
+import GameErrorBoundary from '../features/game/GameErrorBoundary.jsx'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import Button from '../components/Button.jsx'
 import GameLayout from '../features/game/GameLayout.jsx'
@@ -10,7 +11,7 @@ import { arrowFromGame } from '../features/map/arrows.js'
 
 export default function Watch() {
   const { gameId } = useParams()
-  return <WatchScreen key={gameId} gameId={gameId} />
+  return <GameErrorBoundary key={gameId}><WatchScreen gameId={gameId} /></GameErrorBoundary>
 }
 
 function WatchScreen({ gameId }) {
@@ -26,5 +27,5 @@ function WatchScreen({ gameId }) {
     headerExtras={<div className="watch-banner"><span title={`You are watching ${findHuman(game)?.name ?? 'a player'}'s game`}>You are watching {findHuman(game)?.name ?? 'a player'}'s game</span><span className="watch-chip">read-only</span><span className={`watch-chip watch-${playback.status === 'Live' ? 'live' : 'offline'}`} role="status">{playback.status}</span></div>}
     mapProps={{ disabled: true, arrow: playback.arrow ?? arrowFromGame(game), markers: markersFromAttack(battle.attack),
       reinforcement: playback.currentEvent?.type === 'ReinforcementsPlaced' ? playback.currentEvent : null }}
-    controls={<SpectatorStatus game={game} playback={playback} battleBoard={<BattleBoard board={battle.board} territories={game.territories} players={game.players} fastForward={playback.fastForward} />} />} />
+    controls={<SpectatorStatus game={game} playback={playback} battleBoard={<BattleBoard events={events} board={battle.board} territories={game.territories} players={game.players} fastForward={playback.fastForward} />} />} />
 }

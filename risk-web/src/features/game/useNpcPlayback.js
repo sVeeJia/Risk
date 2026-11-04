@@ -1,3 +1,4 @@
+import { isGameAction } from './eventText.js'
 import { useEffect, useRef, useState } from 'react'
 import { playNpcTurn } from '../../api/games.js'
 import { isNpcTurn } from './gameActions.js'
@@ -43,7 +44,7 @@ export default function useNpcPlayback({ game, gameId, busy, setGame, setEvents,
             if (event.type === 'NpcDecision') setDecision({ event, ended: false })
             onBattleEvent?.(event, speed.current)
             setArrow(displayed)
-            setCurrentEvent(event)
+            if (isGameAction(event)) setCurrentEvent(event)
             setEvents(previous => [...previous.filter(item => item.sequence !== event.sequence), event])
           },
           onTurn: nextGame => { setDecision(previous => previous ? { ...previous, ended: true } : null); onBattleTurn?.(); setArrow(null); setCurrentEvent(null); setGame(nextGame) },

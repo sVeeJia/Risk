@@ -1,10 +1,12 @@
+import { eventMessage, latestAction } from './eventText.js'
 import Button from '../../components/Button.jsx'
 import ReplayProgress from './ReplayProgress.jsx'
 import { replaySpeeds } from './replayNavigation.js'
 
 export default function ReplayControls({ steps, clock, board }) {
+  const current = latestAction(steps.slice(0, clock.index + 1).map(step => step.event))
   return <section className="replay-controls" aria-label="Replay controls">
-    <div className="replay-display">{board}<p title={steps[clock.index]?.event.message}>{steps[clock.index]?.event.message ?? 'No events recorded for this game.'}</p></div>
+    <div className="replay-display">{board}<p title={eventMessage(current)}>{eventMessage(current, 'No events recorded for this game.') }</p></div>
     <div className="replay-transport">
       <div className="replay-buttons">
         <Button size="small" disabled={!steps.length} onClick={clock.toggle}>{clock.playing ? 'Pause' : 'Play'}</Button>

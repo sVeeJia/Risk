@@ -1,3 +1,4 @@
+import GameErrorBoundary from '../features/game/GameErrorBoundary.jsx'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth.js'
@@ -16,7 +17,7 @@ import ReplayControls from '../features/game/ReplayControls.jsx'
 
 export default function Replay() {
   const { gameId } = useParams()
-  return <LoadReplay key={gameId} gameId={gameId} />
+  return <GameErrorBoundary key={gameId}><LoadReplay gameId={gameId} /></GameErrorBoundary>
 }
 
 function LoadReplay({ gameId }) {
@@ -50,6 +51,7 @@ function ReadyReplay({ data }) {
   const clock = useReplay(steps)
   const step = steps[clock.index], game = stateAt(steps, clock.index, initial)
   const visual = step?.visual ?? { battle: emptyBattle, arrow: null, decision: null }
+  const latestRoll = steps.slice(0, clock.index + 1).findLast(item => item.event.type === 'BattleRound')?.event.sequence
   const animate = clock.animate && clock.speed <= 4
   const battle = { ...visual.battle, hit: animate && step?.event.type === 'BattleRound' ? visual.battle.hit : null, conquered: animate && step?.event.type === 'CountryConquered' ? visual.battle.conquered : null }
   const human = findHuman(game), ended = steps.length > 0 && !clock.playing && clock.index === steps.length - 1
@@ -62,5 +64,5 @@ function ReadyReplay({ data }) {
     </div>}
     mapOverlay={ended && final.phase === 'Finished' ? <div className="replay-result" role="status">{final.winnerPlayerId === human?.id ? 'You won' : 'You lost'} · Round {final.round}</div> : null}
     mapProps={{ disabled: true, arrow: visual.arrow, markers: markersFromAttack(game.activeAttack), reinforcement: animate && step?.event.type === 'ReinforcementsPlaced' ? step.event : null }}
-    controls={<ReplayControls steps={steps} clock={clock} board={<BattleBoard key={clock.revision} board={battle.board} territories={game.territories} players={game.players} fastForward={clock.speed > 1} animate={animate && step?.event.type === 'BattleRound'} />} />} />
+    controls={<ReplayControls steps={steps} clock={clock} board={<BattleBoard captionSequence={latestRoll} events={events} key={clock.revision} board={battle.board} territories={game.territories} players={game.players} fastForward={clock.speed > 1} animate={animate && step?.event.type === 'BattleRound'} />} />} />
 }

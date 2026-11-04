@@ -2,8 +2,9 @@ import { mergeEvents, newerGame } from './spectatorEvents.js'
 import { replayEvents } from './npcPlayback.js'
 
 // One ordered presentation queue for both human actions and full NPC turns.
-export function createSpectatorQueue({ game, lastSeenSequence, signal, pause, onEvent, onGame, onBusy, onError }) {
+export function createSpectatorQueue({ game, lastSeenSequence, initialEvents = [], signal, pause, onEvent, onGame, onBusy, onError }) {
   const pending = []
+  const seen = new Set(initialEvents.map(event => event.sequence))
   let shown = game
   let cursor = lastSeenSequence
   let running = false
@@ -34,8 +35,13 @@ export function createSpectatorQueue({ game, lastSeenSequence, signal, pause, on
     enqueue(update) {
       if (signal.aborted) return
       newerGame(shown, update.game) // Reject an unversioned snapshot before accepting its events.
-      const fresh = mergeEvents(update.events, cursor)
-      cursor = fresh.lastSeenSequence
+      const fresh = mergeEvents(update.events)
+      fresh.events = fresh.events.filter(event => {
+        if (seen.has(event.sequence)) return false
+        seen.add(event.sequence)
+        return true
+      })
+      cursor = Math.max(cursor, fresh.lastSeenSequence)
       pending.push({ game: update.game, events: fresh.events })
       return drain()
     },

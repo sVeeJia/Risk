@@ -1,10 +1,14 @@
+import { safeText } from './eventText.js'
+import { commentaryFor } from './commentary.js'
+import CommentarySentence from './CommentarySentence.jsx'
 import Die from './Die.jsx'
 import { ownerSlot } from './gameActions.js'
 import { worldRegions } from '../map/worldRegions.js'
 
-export default function BattleBoard({ board, territories, players = [], fastForward = false, commentary = null, animate = true }) {
+export default function BattleBoard({ board, territories, players = [], fastForward = false, events = [], captionSequence, animate = true }) {
+  const commentary = commentaryFor(events, captionSequence ?? board?.sequence)
   const ended = Boolean(board?.ended)
-  if (!board?.result || board.visible === false) return null
+  if (!board?.result || board.visible === false) return captionSequence != null ? <div className="battle-board-slot"><div className="battle-caption" aria-live="polite">{commentary && <p><CommentarySentence event={commentary} /></p>}</div></div> : null
   const name = id => territories.find(country => country.countryId === id)?.name ?? id
   const colour = id => {
     const territory = territories.find(country => country.countryId === id)
@@ -15,7 +19,7 @@ export default function BattleBoard({ board, territories, players = [], fastForw
   const { result } = board
   const diceWidth = result.pairs.length * (result.pairs.length > 6 ? 34 : 48)
   const diceHeight = result.pairs.length > 6 ? 74 : 98
-  return <aside className={`battle-board ${fastForward ? 'battle-visuals-fast' : ''} ${ended ? 'battle-board-ended' : ''} ${animate ? '' : 'battle-board-static'}`} style={{ '--battle-dice-width': `${diceWidth}px` }} aria-label="Battle board">
+  return <div className="battle-board-slot"><div className="battle-caption" aria-live="polite">{commentary && <p><CommentarySentence event={commentary} /></p>}</div><aside className={`battle-board ${fastForward ? 'battle-visuals-fast' : ''} ${ended ? 'battle-board-ended' : ''} ${animate ? '' : 'battle-board-static'}`} style={{ '--battle-dice-width': `${diceWidth}px` }} aria-label="Battle board">
     <header><strong title={`${attacker} vs ${defender}`}>
       <svg className="battle-country-dot" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill={colour(board.attackerId)} /></svg>
       <span className="battle-country-name">{attacker}</span>{' vs '}
@@ -42,8 +46,7 @@ export default function BattleBoard({ board, territories, players = [], fastForw
         <p title={`${attacker} ${board.before?.attackerSoldiers ?? '—'} → ${result.attackerSoldiers} | ${defender} ${board.before?.defenderSoldiers ?? '—'} → ${result.defenderSoldiers}`}><span>{attacker} {board.before?.attackerSoldiers ?? '—'} → {result.attackerSoldiers}</span><span aria-hidden="true"> | </span><span>{defender} {board.before?.defenderSoldiers ?? '—'} → {result.defenderSoldiers}</span></p>
       </footer>
     </> : <p className="battle-board-waiting">Waiting for a roll</p>}
-    {ended && <p className="sr-only">Attack ended{board.reason ? `: ${board.reason}` : ''}</p>}
-    {commentary && <p className="battle-board-commentary" title={commentary}>{commentary}</p>}
+    {ended && <p className="sr-only">Attack ended{board.reason ? `: ${safeText(board.reason)}` : ''}</p>}
     <p className="sr-only" aria-live="polite" aria-atomic="true">{result ? `Round ${board.round}: ${attacker} loses ${result.attackerLosses}, ${defender} loses ${result.defenderLosses}` : `${attacker} attacks ${defender}`}</p>
-  </aside>
+  </aside></div>
 }

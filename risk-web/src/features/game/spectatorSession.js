@@ -23,7 +23,7 @@ export async function spectateSession({ id, signal, getGame, getEvents, createCo
     newerGame(null, game)
     if (!active()) return
     if (onInitial(game, history) === false) return
-    const queue = createQueue(game, mergeEvents(history).lastSeenSequence)
+    const queue = createQueue(game, mergeEvents(history).lastSeenSequence, history)
     connection = createConnection()
     signal.addEventListener('abort', stop, { once: true })
     const receive = update => {
@@ -43,7 +43,7 @@ export async function spectateSession({ id, signal, getGame, getEvents, createCo
       if (!active() || attempt !== epoch) return
       const next = buffered.reduce((latest, update) => newerGame(latest, update.game), newerGame(game, snapshot))
       const combined = [...events, ...buffered.flatMap(update => update.events ?? [])]
-      queue.enqueue({ game: next, events: mergeEvents(combined, queue.lastSeenSequence).events })
+      queue.enqueue({ game: next, events: mergeEvents(combined).events })
       buffered = []
       buffering = false
       onStatus('Live')

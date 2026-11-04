@@ -1,3 +1,5 @@
+import GameErrorBoundary from '../features/game/GameErrorBoundary.jsx'
+import { latestAction } from '../features/game/eventText.js'
 import GameLayout from '../features/game/GameLayout.jsx'
 import ShareLink from '../features/game/ShareLink.jsx'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
@@ -23,7 +25,7 @@ const emptySelection = { from: null, to: null }
 // A new route gets an independent request lifetime and game state.
 export default function Game() {
   const { gameId } = useParams()
-  return <GameScreen key={gameId} gameId={gameId} />
+  return <GameErrorBoundary key={gameId}><GameScreen gameId={gameId} /></GameErrorBoundary>
 }
 
 function GameScreen({ gameId }) {
@@ -84,7 +86,7 @@ function GameScreen({ gameId }) {
       for (const event of response.events) dispatchBattle({ type: 'event', event })
       setSelection(emptySelection)
       const move = response.events.map(arrowForEvent).find(arrow => arrow?.kind === 'move')
-      setMoveArrow(move ? { ...move, transient: true, sequence: response.events.at(-1)?.sequence } : null)
+      setMoveArrow(move ? { ...move, transient: true, sequence: latestAction(response.events)?.sequence } : null)
     } catch (err) {
       if (!controller.signal.aborted) setError(err.status === 404 ? 'This game was not found.' : err.message)
     } finally {
@@ -123,5 +125,5 @@ function GameScreen({ gameId }) {
     headerExtras={<ShareLink gameId={game.id} phase={game.phase} />}
     mapProps={{ onSelect: select, selectedFrom: selection.from, selectedTo: selection.to, disabled: locked, arrow, markers,
       reinforcement: playback.currentEvent?.type === 'ReinforcementsPlaced' ? playback.currentEvent : null }}
-    controls={<ActionPanel key={`${mode}:${actionMode}:${game.round}:${game.activeAttack?.attackerCountryId}`} game={game} selection={selection} actionMode={actionMode} busy={locked} error={playback.error || error} playback={playback} onAction={perform} onMode={value => { setActionMode(value); setSelection(emptySelection) }} battleBoard={<BattleBoard board={battle.board} territories={game.territories} players={game.players} fastForward={battleFast} />} />} />
+    controls={<ActionPanel key={`${mode}:${actionMode}:${game.round}:${game.activeAttack?.attackerCountryId}`} game={game} selection={selection} actionMode={actionMode} busy={locked} error={playback.error || error} playback={playback} onAction={perform} onMode={value => { setActionMode(value); setSelection(emptySelection) }} battleBoard={<BattleBoard events={events} board={battle.board} territories={game.territories} players={game.players} fastForward={battleFast} />} />} />
 }

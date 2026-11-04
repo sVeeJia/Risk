@@ -9,3 +9,9 @@
 .event-log-current { outline: 2px solid #e0c38c; outline-offset: -2px; background: #c6a66c25; }
 @media (min-width: 1100px) { .event-log { position: relative; } .event-log ol { position: absolute; inset: 56px 16px 16px; } }
 @media (max-width: 1099px) { .event-log { height: 320px; box-sizing: border-box; } }
+
+.event-log-filter { display: flex; flex-shrink: 0; margin-bottom: 8px; }
+.event-log-filter button { border: 1px solid #52645b; background: #172325; color: #c6cdbe; padding: 4px 8px; font: inherit; font-size: 11px; cursor: pointer; }
+.event-log-filter button[aria-pressed="true"] { background: #c6ae7e25; color: #e0c38c; }
+.event-log .event-log-facts { margin-top: 5px; color: #94a09e; font-size: 12px; }
+@media (min-width: 1100px) { .event-log ol { top: 90px; } }
