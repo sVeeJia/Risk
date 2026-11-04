@@ -5,9 +5,11 @@ using Risk.Api.Dtos.Mappers;
 using Risk.Api.Dtos.Requests;
 using Risk.Api.Dtos.Responses;
 using Risk.Api.Services.Interfaces;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Risk.Api.Controllers;
 
+[EnableRateLimiting("game")] 
 [ApiController]
 [Authorize]
 [Route("api/games")]
