@@ -1,3 +1,4 @@
+import { isGameAction } from './eventText.js'
 import { useEffect, useRef, useState } from 'react'
 import * as api from '../../api/spectate.js'
 import { emptyBattle, battlePresentation } from './battlePresentation.js'
@@ -27,15 +28,15 @@ export default function useSpectator(gameId) {
         createConnection: api.createGameConnection, onError,
         onStatus: status => update(previous => ({ ...previous, status })),
         onInitial: (game, events) => {
-          update(() => ({ ...initial, game, events, battle: battlePresentation(emptyBattle, { type: 'load', game }) }))
+          update(() => ({ ...initial, game, events, battle: { ...events.reduce((battle, event) => battlePresentation(battle, { type: 'event', event }), emptyBattle), attack: game.activeAttack, liveCounts: {} } }))
           return game.phase !== 'Finished'
         },
-        createQueue: (game, lastSeenSequence) => createSpectatorQueue({ game, lastSeenSequence, signal,
+        createQueue: (game, lastSeenSequence, initialEvents) => createSpectatorQueue({ game, lastSeenSequence, initialEvents, signal,
           pause: kind => playbackPause(kind, () => speed.current, signal),
           onBusy: playing => update(previous => ({ ...previous, playing, currentEvent: playing ? previous.currentEvent : null, arrow: playing ? previous.arrow : null })),
           onError,
           onEvent: (event, arrow) => update(previous => ({ ...previous,
-            events: [...previous.events, event], arrow, currentEvent: event,
+            events: [...previous.events, event], arrow, currentEvent: isGameAction(event) ? event : previous.currentEvent,
             decision: event.type === 'NpcDecision' ? { event, ended: false } : event.type === 'TurnStarted' ? null : previous.decision,
             battle: battlePresentation(previous.battle, { type: 'event', event, live: true, fastForward: speed.current }),
           })),

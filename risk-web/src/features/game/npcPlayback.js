@@ -6,7 +6,7 @@ export async function replayEvents({ events, arrow = null, pause, isActive, onEv
     if (!isActive()) return arrow
     arrow = replayArrow(arrow, event)
     onEvent(event, arrow)
-    await pause('eventPause')
+    if (event.type !== 'Commentary') await pause('eventPause')
   }
   return arrow
 }

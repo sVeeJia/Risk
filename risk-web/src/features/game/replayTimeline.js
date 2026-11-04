@@ -1,15 +1,16 @@
+import { uniqueEvents } from './commentary.js'
 import { applyReplayEvent } from './replayState.js'
 import { battlePresentation, emptyBattle } from './battlePresentation.js'
 import { replayArrow } from '../map/arrows.js'
 
 const durations = { GameStarted: 500, TurnStarted: 500, ReinforcementsReceived: 600, ReinforcementsPlaced: 900,
   AttackStarted: 900, BattleRound: 1400, CountryConquered: 1200, Transfer: 900, PlayerEliminated: 1000,
-  AttackEnded: 500, GameWon: 1800, GameLost: 1800, NpcDecision: 1400, Commentary: 1200, TurnSkipped: 500 }
+  AttackEnded: 500, GameWon: 1800, GameLost: 1800, NpcDecision: 1400, TurnSkipped: 500 }
 
 export function buildTimeline(initialState, events) {
   let state = initialState, startMs = 0, battle = emptyBattle, arrow = null, decision = null
   const human = initialState.players.find(player => player.isHuman)
-  return [...events].sort((a, b) => a.sequence - b.sequence).map((event, index) => {
+  return uniqueEvents(events).filter(event => event.type !== 'Commentary').map((event, index) => {
     const before = state, result = applyReplayEvent(state, event)
     state = result.state
     // Older AttackStarted records have only endpoints; the reconstructed pre-event counts supply visual context.
