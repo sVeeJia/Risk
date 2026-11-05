@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Swords } from 'lucide-react'
+import { ArrowLeft, Flag, Swords } from 'lucide-react'
 import { toAssignments } from './boardAssignments.js'
 import { ownerSlot, panelMode } from './gameActions.js'
+import { playerSummary } from './playerSummary.js'
 import EventLog from './EventLog.jsx'
 import GameOver from './GameOver.jsx'
 import Button from '../../components/Button.jsx'
@@ -35,17 +36,24 @@ export default function GameLayout({ game, events, battle, playback, battleFast,
         <section className="game-page-dock-players" aria-label="Players">
         <p className="eyebrow">PLAYERS</p>
         <ol className="game-page-players">
-          {game.players.map(player => <li key={player.id} className={`${player.id === game.currentPlayerId ? 'game-page-player-current' : ''} ${player.isEliminated ? 'game-page-player-eliminated' : ''}`}>
-            <svg className="game-page-owner-dot" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill={worldRegions[ownerSlot(game, { ...game.territories.find(t => t.countryId === player.startingCountryId), ownerPlayerId: player.id }) - 1]?.color} /></svg>
+          {game.players.map(player => {
+            const summary = playerSummary(game, player)
+            return <li key={player.id} className={`${player.id === game.currentPlayerId ? 'game-page-player-current' : ''} ${player.isEliminated ? 'game-page-player-eliminated' : ''}`}>
+            <svg className="game-page-owner-dot" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill={worldRegions[summary.slot - 1]?.color} /></svg>
             <div className="game-page-player-name">
-              <strong title={player.name}>{player.name}</strong>{player.isHuman && !readOnly && <span className="game-page-you"> (you)</span>}
+              <strong title={summary.name}>{summary.name}</strong>{player.isHuman && !readOnly && <span className="game-page-you"> (you)</span>}
               {mode !== 'finished' && player.pendingReinforcements > 0 && <span className="game-page-badge" aria-label={`${player.pendingReinforcements} pending reinforcements`}>+{player.pendingReinforcements}</span>}
               {player.isEliminated && <span className="game-page-badge game-page-badge-eliminated" aria-label="Eliminated" title="Eliminated">×</span>}
             </div>
-            <span className="assignment-soldiers" aria-label={`${game.territories.find(t => t.countryId === player.startingCountryId)?.soldiers ?? 0} soldiers in starting country`}>
-              <Swords size={14} aria-hidden="true" />{game.territories.find(t => t.countryId === player.startingCountryId)?.soldiers ?? 0}
+            <span className="game-page-player-stats">
+              <span className="assignment-soldiers" aria-label={`${summary.soldiers} soldiers`} title="Total soldiers">
+                <Swords size={14} aria-hidden="true" />{summary.soldiers}
+              </span>
+              <span className="assignment-soldiers" aria-label={`${summary.countries} countries owned`} title="Countries owned">
+                <Flag size={12} aria-hidden="true" />{summary.countries}
+              </span>
             </span>
-          </li>)}
+          </li>})}
         </ol>
         </section>
         <section className="game-page-dock-controls" aria-label="Current turn">
