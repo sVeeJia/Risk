@@ -5,6 +5,12 @@
 
 # dotenv files
 .env
+docker-compose/.env
+
+# npm cache
+.npm-cache/
+
+Risk.Api/wwwroot/
 
 # User-specific files
 *.rsuser

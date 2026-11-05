@@ -1,0 +1,8 @@
+**/bin
+**/obj
+**/node_modules
+risk-web/dist
+risk-web/.npm-cache
+Risk.Api/wwwroot
+Risk.Tests
+.git
