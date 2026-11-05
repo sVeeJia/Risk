@@ -403,8 +403,9 @@ The API serves everything under `/api`, plus a SignalR hub for live viewing.
 | `/health` | Health check | No |
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
+References:
+GeeksforGeeks. 2025. Shuffle a given array using Fisher–yates shuffle algorithm. [Online]. Available at: https://www.geeksforgeeks.org/dsa/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/ [Accessed 26 October 2026].
+worldometer. 2025. Countries in the world by population (2025). [Online]. Available at: https://www.worldometers.info/world-population/population-by-country/ [Accessed 20 October 2026].
 
 
 
