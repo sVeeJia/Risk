@@ -23,17 +23,18 @@
 .game-page-turn { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 18px; color: #e0c38c; overflow-wrap: anywhere; }
 .game-page-note { margin: 0 0 28px; font-size: 12px; line-height: 1.7; color: #899b90; }
 .game-page-players { display: grid; grid-auto-flow: column; grid-template-rows: repeat(5, 26px); grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 10px; list-style: none; padding: 0; margin: 0; }
-.game-page-players li { box-sizing: border-box; display: grid; grid-template-columns: 8px minmax(0, 1fr) 36px; align-items: center; gap: 5px; min-width: 0; height: 26px; padding: 2px 4px; border-top: 1px solid #ffffff12; border-left: 3px solid transparent; font-size: 11px; }
+.game-page-players li { box-sizing: border-box; display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; gap: 5px; min-width: 0; height: 26px; padding: 2px 4px; border-top: 1px solid #ffffff12; border-left: 3px solid transparent; font-size: 11px; }
 .game-page-player-name { min-width: 0; display: flex; align-items: center; gap: 3px; white-space: nowrap; line-height: 1.4; }
 .game-page-player-name strong { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .game-page-player-name > span { flex-shrink: 0; }
+.game-page-player-stats { display: flex; align-items: center; gap: 8px; }
 .game-page-players .assignment-soldiers { display: flex; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0; font-variant-numeric: tabular-nums; }
 .game-page-players .assignment-soldiers svg { flex-shrink: 0; }
 .game-page-owner-dot { width: 10px; height: 10px; flex: 0 0 10px; border-radius: 50%; border: 1px solid #ffffff40; }
 .game-page-players .game-page-player-current { background: #c6a66c12; color: #e0c38c; border-left-color: #c6ae7e; }
 .game-page-you { color: #94a09e; font-size: 11px; }
 .game-page-badge { display: inline-block; padding: 0 4px; border: 1px solid #c6ae7e60; border-radius: 12px; color: #e0c38c; font-size: 10px; vertical-align: middle; }
-.game-page-player-eliminated { opacity: .55; }
+.game-page-players .game-page-player-eliminated { opacity: .55; color: #94a09e; }
 .game-page-player-eliminated strong { text-decoration: line-through; }
 .game-page-badge-eliminated { color: #94a09e; border-color: #52645b; }
 .game-page-message { max-width: 520px; margin: 15svh auto; padding: 28px; border: 1px solid #52645b; background: #172325; color: #c6cdbe; text-align: center; }
