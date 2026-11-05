@@ -365,7 +365,7 @@ The server is authoritative. The browser sends only choices, and the server roll
 - Registering with an email that's already taken reveals that the email exists.
 - Logging out clears the cookie, but the token isn't revoked and stays valid until it expires.
 - The live-viewing hub has no per-connection limit.
-- `npm audit` reports 6 moderate findings, all in development tooling. The production dependencies are clean.
+- `npm audit` reports moderate findings in development tooling only. The production dependencies are clean.
 
 ## Testing
 
